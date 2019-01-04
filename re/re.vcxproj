@@ -115,19 +115,27 @@
   <ItemGroup>
     <ClInclude Include="Ast.h" />
     <ClInclude Include="CodeToken.h" />
+    <ClInclude Include="DFAModel.h" />
     <ClInclude Include="FixedMemoryPool.h" />
+    <ClInclude Include="Lexicon.h" />
+    <ClInclude Include="NFAConvertHelper.h" />
     <ClInclude Include="NFAModel.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="RegularExpression.h" />
     <ClInclude Include="RegularExpressionConverter.h" />
-    <ClInclude Include="REParser.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="Scanner.h" />
+    <ClInclude Include="UtilMethods.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CodeToken.cpp" />
+    <ClCompile Include="DFAModel.cpp" />
+    <ClCompile Include="Lexicon.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="NFA.cpp" />
+    <ClCompile Include="NFAModel.cpp" />
+    <ClCompile Include="NFAConvertHelper.cpp" />
     <ClCompile Include="RegularExpression.cpp" />
     <ClCompile Include="RegularExpressionConverter.cpp" />
-    <ClCompile Include="REParser.cpp" />
+    <ClCompile Include="Scanner.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

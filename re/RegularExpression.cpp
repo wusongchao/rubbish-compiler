@@ -2,9 +2,11 @@
 #include <sstream>
 
 #include "RegularExpression.h"
+#include "RegularExpressionConverter.h"
 
 using std::stack;
 using std::ostringstream;
+using std::vector;
 
 string RegularExpression::toString()
 {
@@ -19,6 +21,11 @@ CatExpression::CatExpression(RegularExpression * lhs, RegularExpression * rhs)
 string CatExpression::toString()
 {
     return lchild->toString() + '.' + rchild->toString();
+}
+
+NFAModel CatExpression::accept(RegularExpressionConverter & converter)
+{
+    return converter.convertCat(this);
 }
 
 CatExpression::~CatExpression()
@@ -37,6 +44,11 @@ string OrExpression::toString()
     return lchild->toString() + '|' + rchild->toString();
 }
 
+NFAModel OrExpression::accept(RegularExpressionConverter & converter)
+{
+    return converter.convertOr(this);
+}
+
 OrExpression::~OrExpression()
 {
     delete lchild;
@@ -51,6 +63,11 @@ StarExpression::StarExpression(RegularExpression* re)
 string StarExpression::toString()
 {
     return '(' + child->toString() + ")*";
+}
+
+NFAModel StarExpression::accept(RegularExpressionConverter & converter)
+{
+    return converter.convertStar(this);
 }
 
 StarExpression::~StarExpression()
@@ -68,9 +85,19 @@ string SymbolExpression::toString()
     return string(1, symbol);
 }
 
+NFAModel SymbolExpression::accept(RegularExpressionConverter & converter)
+{
+    return converter.convertSymbol(this);
+}
+
 string EmptyExpression::toString()
 {
     return string();
+}
+
+NFAModel EmptyExpression::accept(RegularExpressionConverter & converter)
+{
+    return converter.convertEmpty(this);
 }
 
 Comparsion priority(Operator lhs, Operator rhs)
@@ -128,14 +155,20 @@ char getChar(const string& str, size_t& counter, char& tempStorage)
     return str[++counter];
 }
 
-char getChar(string::const_iterator& it, char& tempStorage)
+char getChar(string::const_iterator& it, string::const_iterator& end, char& tempStorage)
 {
     if (tempStorage) {
         char res = tempStorage;
         tempStorage = 0;
         return res;
     }
-    return *(++it);
+    
+    auto next = ++it;
+    if (next == end) {
+        return 0;
+    }
+
+    return *next;
 }
 
 bool isIdentifier(char ch)
@@ -171,7 +204,7 @@ RegularExpression* operatorPrecedenceParse(const string& regex)
             } else {
                 expressions.push(new SymbolExpression(c));
                 prev = c;
-                c = getChar(it, tempStorage);
+                c = getChar(it, endIter, tempStorage);
                 //c = getChar(regex, counter, tempStorage);
             }
         } else {
@@ -185,13 +218,13 @@ RegularExpression* operatorPrecedenceParse(const string& regex)
                 case Comparsion::less:
                     operators.push(op);
                     prev = c;
-                    c = getChar(it, tempStorage);
+                    c = getChar(it, endIter, tempStorage);
                     //c = getChar(regex, counter, tempStorage);
                     break;
                 case Comparsion::equal:
                     operators.pop();
                     prev = c;
-                    c = getChar(it, tempStorage);
+                    c = getChar(it, endIter, tempStorage);
                     //c = getChar(regex, counter, tempStorage);
                     break;
                 case Comparsion::greater:
@@ -222,7 +255,7 @@ RegularExpression* operatorPrecedenceParse(const string& regex)
         return nullptr;
     }
 
-    if (expressions.size() != 1 || false) {
+    if (expressions.size() != 1 || operators.size() != 1) {
         return nullptr;
     }
     return expressions.top();
@@ -232,12 +265,34 @@ RegularExpression * range(char min, char max)
 {
     // [min, max]
     vector<char> rangeCharSet;
-    for (char c = min; c <= max; c++)
+    int edge = max;
+    for (int c = min; c <= edge; c++)
     {
         rangeCharSet.push_back(c);
     }
 
     return new AlternationCharSetExpression(std::move(rangeCharSet));
+}
+
+RegularExpression * allLetters()
+{
+    return new OrExpression(range('A', 'Z'), range('a', 'z'));
+}
+
+RegularExpression * allDigits()
+{
+    return range('0', '9');
+}
+
+RegularExpression * symbol(char ch)
+{
+    return new SymbolExpression(ch);
+}
+
+RegularExpression * visibleChars()
+{
+    // ' ' to ~
+    return range(32, 126);
 }
 
 AlternationCharSetExpression::AlternationCharSetExpression(const vector<char>& charSet)
@@ -259,4 +314,34 @@ string AlternationCharSetExpression::toString()
     }
     
     return stream.str();
+}
+
+NFAModel AlternationCharSetExpression::accept(RegularExpressionConverter & converter)
+{
+    return converter.convertAlternationCharSet(this);
+}
+
+StringLiteralExpression::StringLiteralExpression(const string & str)
+    :literal(str)
+{
+}
+
+StringLiteralExpression::StringLiteralExpression(string&& str)
+    :literal(std::move(str))
+{
+}
+
+StringLiteralExpression::StringLiteralExpression(const char* str)
+    :literal(str)
+{
+}
+
+string StringLiteralExpression::toString()
+{
+    return literal;
+}
+
+NFAModel StringLiteralExpression::accept(RegularExpressionConverter & converter)
+{
+    return converter.convertStringLiteral(this);
 }

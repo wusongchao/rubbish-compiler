@@ -5,6 +5,10 @@
 
 using std::string;
 
+// forward declaration
+// since cross reference in header is invalid
+class RegularExpressionConverter;
+
 // why unscope enum?
 // use as index. see Effective Modern C++ Item 10
 enum RegularExpressionOperator {
@@ -15,7 +19,6 @@ enum class Comparsion {
     less, equal, greater, invalid
 };
 
-
 using Operator = RegularExpressionOperator;
 
 class RegularExpression
@@ -23,7 +26,7 @@ class RegularExpression
 public:
     virtual string toString() = 0;
    
-    virtual NFAModel* accept() = 0;
+    virtual NFAModel accept(RegularExpressionConverter& converter) = 0;
 
     virtual ~RegularExpression() = default;
 };
@@ -35,7 +38,17 @@ public:
 
     string toString() override;
 
-    NFAModel* accept() override;
+    NFAModel accept(RegularExpressionConverter& converter) override;
+
+    RegularExpression* getLchild()
+    {
+        return lchild;
+    }
+
+    RegularExpression* getRchild()
+    {
+        return rchild;
+    }
 
     virtual ~CatExpression();
 private:
@@ -50,7 +63,17 @@ public:
 
     string toString() override;
 
-    NFAModel* accept() override;
+    NFAModel accept(RegularExpressionConverter& converter) override;
+
+    RegularExpression* getLchild()
+    {
+        return lchild;
+    }
+
+    RegularExpression* getRchild()
+    {
+        return rchild;
+    }
 
     virtual ~OrExpression();
 private:
@@ -65,7 +88,12 @@ public:
 
     string toString() override;
 
-    NFAModel* accept() override;
+    NFAModel accept(RegularExpressionConverter& converter) override;
+
+    RegularExpression* getChild()
+    {
+        return child;
+    }
 
     virtual ~StarExpression();
 private:
@@ -79,8 +107,12 @@ public:
 
     string toString() override;
 
-    NFAModel* accept() override;
+    NFAModel accept(RegularExpressionConverter& converter) override;
 
+    char getSymbol() const
+    {
+        return symbol;
+    }
 private:
     char symbol;
 };
@@ -93,7 +125,12 @@ public:
 
     string toString() override;
 
-    NFAModel* accept() override;
+    NFAModel accept(RegularExpressionConverter& converter) override;
+
+    const vector<char>& getCharSet() const
+    {
+        return charSet;
+    }
 private:
     vector<char> charSet;
 };
@@ -105,7 +142,25 @@ public:
 
     string toString() override;
 
-    NFAModel* accept() override;
+    NFAModel accept(RegularExpressionConverter& converter) override;
+};
+
+class StringLiteralExpression : public RegularExpression {
+public:
+    StringLiteralExpression(const string& str);
+    StringLiteralExpression(string&& str);
+    StringLiteralExpression(const char* str);
+
+    string toString() override;
+
+    NFAModel accept(RegularExpressionConverter& converter) override;
+
+    const string& getLiteral() const
+    {
+        return literal;
+    }
+private:
+    string literal;
 };
 
 Comparsion priority(Operator lhs, Operator rhs);
@@ -124,7 +179,26 @@ RegularExpression* operatorPrecedenceParse(const string& regex);
 
 RegularExpression* range(char min, char max);
 
-RegularExpression* literal(const string& )
+RegularExpression* allLetters();
 
+RegularExpression* allDigits();
 
+RegularExpression* symbol(char ch);
 
+RegularExpression* visibleChars();
+
+template
+<typename T>
+RegularExpression* literal(T&& str)
+{
+    return new StringLiteralExpression(std::forward<T>(str));
+}
+
+// the str type is restrict by the StringLiteralExpression's constructor
+// so a universal reference is safe
+//template
+//<typename T>
+//RegularExpression * literal(T && str)
+//{
+//    return new StringLiteralExpression(std::forward<T>(str));
+//}

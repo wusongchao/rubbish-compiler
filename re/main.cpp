@@ -1,54 +1,98 @@
-//#include <iostream>
-//#include "FixedMemoryPool.h"
-//#include <cassert>
-//
-//using std::cin;
-//using std::cout;
-//using std::endl;
-//
-//struct A {
-//    int x;
-//    int y;
-//
-//    A(int x, int y)
-//        :x(x), y(y)
-//    {
-//
-//    }
-//    
-//    ~A()
-//    {
-//        cout << "destructor call" << endl;
-//    }
-//};
-//
-//void test1()
-//{
-//    FixedMemoryPool<A> pool;
-//    A* a1 = pool.newElement(1, 2);
-//    cout << a1->x << ' ' << a1->y << endl;
-//}
-//
-//void test2()
-//{
-//    FixedMemoryPool<A> pool(2);
-//
-//    constexpr int n = 3;
-//    A* ptrs[n];
-//    for (int i = 0; i < n; i++) {
-//        ptrs[i] = pool.newElement(i, i + 1);
-//    }
-//
-//    for (int i = 0; i < n; i++) {
-//        A* p = ptrs[i];
-//        assert((p->x == i) && (p->y == i+1));
-//    }
-//}
-//
-//int main()
-//{
-//    test1();
-//    test2();
-//    cin.get();
-//    return 0;
-//}
+#include <iostream>
+#include <sstream>
+#include "RegularExpressionConverter.h"
+#include "RegularExpression.h"
+#include "NFAConvertHelper.h"
+#include "Scanner.h"
+
+using std::cin;
+using std::cout;
+using std::endl;
+using std::unordered_set;
+using std::make_shared;
+using std::istringstream;
+
+int main()
+{
+    Lexicon lexicon;
+    lexicon.defineToken(literal("program"), CodeTokenType::Program);
+    lexicon.defineToken(literal("const"), CodeTokenType::Const);
+    lexicon.defineToken(literal("var"), CodeTokenType::Var);
+    lexicon.defineToken(literal("procedure"), CodeTokenType::Procedure);
+    lexicon.defineToken(literal("begin"), CodeTokenType::Begin);
+    lexicon.defineToken(literal("end"), CodeTokenType::End);
+    lexicon.defineToken(literal("if"), CodeTokenType::If);
+    lexicon.defineToken(literal("then"), CodeTokenType::Then);
+    lexicon.defineToken(literal("else"), CodeTokenType::Else);
+    lexicon.defineToken(literal("while"), CodeTokenType::While);
+    lexicon.defineToken(literal("do"), CodeTokenType::Do);
+    lexicon.defineToken(literal("call"), CodeTokenType::Call);
+    lexicon.defineToken(literal("read"), CodeTokenType::Read);
+    lexicon.defineToken(literal("write"), CodeTokenType::Write);
+
+    lexicon.defineToken(
+        new CatExpression(
+            allLetters(),
+            new StarExpression(
+                new OrExpression(allLetters(), allDigits())
+            )
+        ),
+        CodeTokenType::Id
+    );
+    lexicon.defineToken(
+        new CatExpression(
+            allDigits(),
+            new StarExpression(allDigits())
+        ),
+        CodeTokenType::Integer
+    );
+
+    lexicon.defineToken(symbol('<'), CodeTokenType::LT);
+    lexicon.defineToken(symbol('>'), CodeTokenType::GT);
+    lexicon.defineToken(literal("<="), CodeTokenType::LE);
+    lexicon.defineToken(literal(">="), CodeTokenType::GE);
+    lexicon.defineToken(symbol('='), CodeTokenType::EQ);
+    lexicon.defineToken(literal("<>"), CodeTokenType::NE);
+    lexicon.defineToken(literal(":="), CodeTokenType::Assign);
+    lexicon.defineToken(symbol('+'), CodeTokenType::Add);
+    lexicon.defineToken(symbol('-'), CodeTokenType::Sub);
+    lexicon.defineToken(symbol('*'), CodeTokenType::Mul);
+    lexicon.defineToken(symbol('/'), CodeTokenType::Div);
+    lexicon.defineToken(symbol('%'), CodeTokenType::Mod);
+    lexicon.defineToken(symbol('('), CodeTokenType::OpenParenthesis);
+    lexicon.defineToken(symbol(')'), CodeTokenType::CloseParenthesis);
+    lexicon.defineToken(symbol(','), CodeTokenType::Comma);
+    lexicon.defineToken(symbol(';'), CodeTokenType::Semicolon);
+    lexicon.defineToken(symbol(' '), CodeTokenType::WhiteSpace);
+    lexicon.defineToken(new OrExpression(symbol('\n'), literal("\r\n")), CodeTokenType::LineBreaker);
+    lexicon.defineToken(
+        new CatExpression(
+            literal("//"), 
+            new StarExpression(visibleChars())
+        ),
+        CodeTokenType::Comment
+    );
+
+
+    istream& stream = istringstream(
+        "program fuck;"
+        "begin\n"
+        "if i = 4 then\n"
+        "t = 342+5\n"
+        "//fuck you\n"
+        "end"
+    );
+    Scanner scanner(stream, lexicon.createScannerInfo());
+    scanner.addSkipToken(CodeTokenType::WhiteSpace);
+    scanner.addSkipToken(CodeTokenType::LineBreaker);
+    scanner.addSkipToken(CodeTokenType::Comment);
+    while (!scanner.isFinish()) {
+        CodeToken token = scanner.read();
+        cout << (int)token.tokenType << ' ' << token.value << endl;
+    }
+
+    //token = scanner.read();
+    //cout << (int)token.tokenType << endl;
+    cin.get();
+    return 0;
+}
