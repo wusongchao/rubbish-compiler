@@ -8,6 +8,9 @@
 #include "../re/Scanner.h"
 #include <memory>
 
+#define TEST_TOKEN(type, c_str_value) \
+    {CodeToken token = scanner.read(); Assert::IsTrue(token.tokenType == CodeTokenType::Program); Assert::AreEqual(token.value, string(c_str_value));}
+
 using std::cout;
 using std::endl;
 using std::istringstream;
@@ -74,20 +77,43 @@ namespace UnitTest1
             lexicon.defineToken(symbol(','), CodeTokenType::Comma);
             lexicon.defineToken(symbol(';'), CodeTokenType::Semicolon);
             lexicon.defineToken(symbol(' '), CodeTokenType::WhiteSpace);
+            lexicon.defineToken(new OrExpression(symbol('\n'), literal("\r\n")), CodeTokenType::LineBreaker);
             lexicon.defineToken(
                 new CatExpression(
                     literal("//"),
-                    new StarExpression(range(0, CHAR_MAX))
+                    new StarExpression(visibleChars())
                 ),
                 CodeTokenType::Comment
             );
 
+
             istream& stream = istringstream(
-                "program"
-                ""
+                "program fuck;"
+                "begin\n"
+                "if i = 4 then\n"
+                "t := 342+5\n"
+                "//fuck you\n"
+                "end"
             );
             Scanner scanner(stream, lexicon.createScannerInfo());
             scanner.addSkipToken(CodeTokenType::WhiteSpace);
+            scanner.addSkipToken(CodeTokenType::LineBreaker);
+            scanner.addSkipToken(CodeTokenType::Comment);
+            TEST_TOKEN(CodeTokenType::Program, "program");
+            TEST_TOKEN(CodeTokenType::Id, "fuck");
+            TEST_TOKEN(CodeTokenType::Semicolon, ";");
+            TEST_TOKEN(CodeTokenType::Begin, "begin");
+            TEST_TOKEN(CodeTokenType::If, "if");
+            TEST_TOKEN(CodeTokenType::Id, "i");
+            TEST_TOKEN(CodeTokenType::EQ, "=");
+            TEST_TOKEN(CodeTokenType::Then, "then");
+            TEST_TOKEN(CodeTokenType::Id, "t");
+            TEST_TOKEN(CodeTokenType::Assign, ":=");
+            TEST_TOKEN(CodeTokenType::Integer, "342");
+            TEST_TOKEN(CodeTokenType::Add, "+");
+            TEST_TOKEN(CodeTokenType::Integer, "5");
+            TEST_TOKEN(CodeTokenType::End, "end");
+            TEST_TOKEN(CodeTokenType::Eof, "");
 		}
 
         TEST_METHOD(TestMethod2)

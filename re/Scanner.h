@@ -16,6 +16,11 @@ public:
         skipTokens.insert(tokenType);
     }
 
+ /*   void setInputStream(istream&& stream)
+    {
+        inputStream = std::move(stream);
+    }*/
+
     CodeToken read();
 
     bool isFinish()
@@ -24,6 +29,8 @@ public:
     }
 private:
     istream& inputStream;
+
+    int currentRow = 1;
 
     bool finish = false;
 

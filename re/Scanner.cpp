@@ -19,7 +19,8 @@ CodeToken Scanner::read()
     
     ostringstream stream;
     char ch;
-    while (state != 0) {
+
+    while (true) {
         ch = inputStream.peek();
         if (ch == Scanner::Eof) {
             finish = true;
@@ -28,10 +29,16 @@ CodeToken Scanner::read()
         } else {
             lastState = state;
             state = (*transformTable)[lastState][ch];
-            if (state != 0) {
-                stream << ch;
-                inputStream.get();
+            if (ch == '\n') {
+                currentRow++;
             }
+        }
+
+        if (state == 0) {
+            break;
+        } else {
+            stream << ch;
+            inputStream.get();
         }
     }
 
@@ -40,11 +47,7 @@ CodeToken Scanner::read()
 
         if (skipTokens.find(tokenType) != skipTokens.end()) {
             // read next
-            if (finish) {
-                return{ CodeTokenType::Eof, stream.str() };
-            } else {
-                return read();
-            }
+            return read();
         } else {
             return{ tokenType, stream.str() };
         }
@@ -55,5 +58,42 @@ CodeToken Scanner::read()
             return{ CodeTokenType::Unknown, stream.str() };
         }
     }
+
+    //while (state != 0) {
+    //    ch = inputStream.peek();
+    //    if (ch == Scanner::Eof) {
+    //        finish = true;
+    //        lastState = state;
+    //        state = 0;
+    //    } else {
+    //        lastState = state;
+    //        state = (*transformTable)[lastState][ch];
+    //        if (state != 0) {
+    //            stream << ch;
+    //            inputStream.get();
+    //        }
+    //    }
+    //}
+
+    //if ((*acceptTable)[lastState] == true) {
+    //    CodeTokenType tokenType = (*acceptStateToTokenMap)[lastState];
+
+    //    if (skipTokens.find(tokenType) != skipTokens.end()) {
+    //        // read next
+    //        if (finish) {
+    //            return{ CodeTokenType::Eof, stream.str() };
+    //        } else {
+    //            return read();
+    //        }
+    //    } else {
+    //        return{ tokenType, stream.str() };
+    //    }
+    //} else {
+    //    if (ch == Scanner::Eof) {
+    //        return{ CodeTokenType::Eof, stream.str() };
+    //    } else {
+    //        return{ CodeTokenType::Unknown, stream.str() };
+    //    }
+    //}
 }
 
