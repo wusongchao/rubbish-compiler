@@ -56,9 +56,9 @@ struct CodeToken {
     string value;
     int rowIndex = -1;
     
-    CodeToken(CodeTokenType type, const string& str);
-    CodeToken(CodeTokenType type, string&& str);
-    CodeToken(CodeTokenType type, const char* str);
+    CodeToken(CodeTokenType type, const string& str, int rowIndex);
+    CodeToken(CodeTokenType type, string&& str, int rowIndex);
+    CodeToken(CodeTokenType type, const char* str, int rowIndex);
     CodeToken(CodeToken&& token) noexcept;
     CodeToken& operator=(CodeToken&& token) noexcept;
 };

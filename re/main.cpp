@@ -88,7 +88,7 @@ int main()
     scanner.addSkipToken(CodeTokenType::Comment);
     while (!scanner.isFinish()) {
         CodeToken token = scanner.read();
-        cout << (int)token.tokenType << ' ' << token.value << endl;
+        cout << (int)token.tokenType << ' ' << token.value << ' ' << token.rowIndex << endl;
     }
 
     //token = scanner.read();

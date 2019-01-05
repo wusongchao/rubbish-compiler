@@ -16,11 +16,6 @@ public:
         skipTokens.insert(tokenType);
     }
 
- /*   void setInputStream(istream&& stream)
-    {
-        inputStream = std::move(stream);
-    }*/
-
     CodeToken read();
 
     bool isFinish()

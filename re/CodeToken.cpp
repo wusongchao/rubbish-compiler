@@ -25,23 +25,23 @@ TokenInfo::TokenInfo(RegularExpression * re, CodeTokenType tokenType)
 {
 }
 
-CodeToken::CodeToken(CodeTokenType type, const string & str)
-    :tokenType(type), value(str)
+CodeToken::CodeToken(CodeTokenType type, const string & str, int rowIndex)
+    :tokenType(type), value(str), rowIndex(rowIndex)
 {
 }
 
-CodeToken::CodeToken(CodeTokenType type, string && str)
-    :tokenType(type), value(std::move(str))
+CodeToken::CodeToken(CodeTokenType type, string && str, int rowIndex)
+    :tokenType(type), value(std::move(str)), rowIndex(rowIndex)
 {
 }
 
-CodeToken::CodeToken(CodeTokenType type, const char * str)
-    :tokenType(type), value(str)
+CodeToken::CodeToken(CodeTokenType type, const char * str, int rowIndex)
+    :tokenType(type), value(str), rowIndex(rowIndex)
 {
 }
 
 CodeToken::CodeToken(CodeToken && token) noexcept
-    :tokenType(tokenType), value(std::move(token.value))
+    :tokenType(tokenType), value(std::move(token.value)), rowIndex(token.rowIndex)
 {
 }
 
@@ -53,6 +53,7 @@ CodeToken & CodeToken::operator=(CodeToken && token) noexcept
     
     tokenType = token.tokenType;
     value = std::move(token.value);
+    rowIndex = token.rowIndex;
 
     return *this;
 }
