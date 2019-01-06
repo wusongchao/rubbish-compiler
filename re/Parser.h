@@ -36,6 +36,11 @@ private:
         throw SyntaxError(str);
     }
 
+    void semanticError(const char* str)
+    {
+        throw SemanticError(str);
+    }
+
     void move() {
         lookahead = scanner.read();
     }

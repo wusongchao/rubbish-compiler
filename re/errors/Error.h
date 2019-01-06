@@ -8,3 +8,9 @@ class SyntaxError : exception
 public:
     SyntaxError(const char* message);
 };
+
+class SemanticError : exception
+{
+public:
+    SemanticError(const char* message);
+};

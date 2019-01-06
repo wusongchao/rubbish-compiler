@@ -10,7 +10,7 @@ shared_ptr<Program> Parser::program()
     match(CodeTokenType::Program);
     match(CodeTokenType::Id);
     match(CodeTokenType::Semicolon);
-    auto stmt(block());
+    auto stmt{ block() };
 
     return nullptr;
 }
@@ -63,7 +63,7 @@ void Parser::condecl()
     match(CodeTokenType::Id);
     match(CodeTokenType::Assign);
     match(CodeTokenType::Integer);
-    auto id = make_shared<Id>(token, Type::Int, true);
+    auto id{ make_shared<Id>(token, Type::Int, true) };
     top->putSymbol(token, id); 
 }
 
@@ -77,13 +77,13 @@ void Parser::vardecls()
     match(CodeTokenType::Var);
     CodeToken token = lookahead;
     match(CodeTokenType::Id);
-    auto id = make_shared<Id>(token, Type::Int);
+    auto id{ make_shared<Id>(token, Type::Int) };
     top->putSymbol(token, id);
     while (lookahead.tokenType == CodeTokenType::Comma) {
         match(CodeTokenType::Comma);
         CodeToken token = lookahead;
         match(CodeTokenType::Id);
-        auto id = make_shared<Id>(token, Type::Int);
+        auto id{ make_shared<Id>(token, Type::Int) };
         top->putSymbol(token, id);
     }
 }
@@ -133,6 +133,34 @@ shared_ptr<Expr> Parser::term()
 shared_ptr<Expr> Parser::factor()
 // <factor>¡ú<id> | <integer> | (<exp>)
 {
+    switch (lookahead.tokenType)
+    {
+        case CodeTokenType::Id:
+        {
+            CodeToken token = lookahead;
+            match(CodeTokenType::Integer);
+            auto beReferenced = top->getSymbol(token);
+            if (beReferenced == nullptr) {
+                semanticError("reference to undefined identifier");
+            }
+            
+        }
+        case CodeTokenType::Integer:
+        {
+            CodeToken token = lookahead;
+            match(CodeTokenType::Integer);
+            return make_shared<Constant>(std::move(token), Type::Int);
+        }
+        case CodeTokenType::OpenParenthesis:
+        {
+            match(CodeTokenType::OpenParenthesis);
+            auto res{ expr() };
+            match(CodeTokenType::CloseParenthesis);
+            return res;
+        }
+        default:
+            break;
+    }
     return shared_ptr<Expr>();
 }
 

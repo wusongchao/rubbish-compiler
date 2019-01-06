@@ -5,8 +5,9 @@
 
 class Expr : public Ast {
 public:
-    Expr(const CodeToken& token, Type type);
-    Expr(const CodeToken& token, Type type, bool constant);
+    Expr(const CodeToken& token, Type type, bool constant = false);
+
+    Expr(CodeToken&& token, Type type, bool constant = false);
 
     void accept(AstVisitor& visitor) override;
 
@@ -27,6 +28,14 @@ private:
 
 class Id : public Expr {
 public:
-    Id(const CodeToken& token, Type type);
-    Id(const CodeToken& token, Type type, bool constant);
+    Id(const CodeToken& token, Type type, bool constant = false);
+
+    Id(CodeToken&& token, Type type, bool constant = false);
+};
+
+class Constant : public Expr {
+public:
+    Constant(const CodeToken& token, Type type);
+
+    Constant(CodeToken&& token, Type type);
 };

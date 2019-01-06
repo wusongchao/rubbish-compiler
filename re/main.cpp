@@ -105,6 +105,7 @@ int main()
     Parser parser(scanner);
 
     auto p = parser.program();
+
     //while (!scanner.isFinish()) {
     //    CodeToken token = scanner.read();
     //    cout << (int)token.tokenType << ' ' << token.value << ' ' << token.rowIndex << endl;
