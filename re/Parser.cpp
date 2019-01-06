@@ -88,6 +88,54 @@ void Parser::vardecls()
     }
 }
 
+shared_ptr<Stmt> Parser::stmt()
+//<statement> ¡ú <id> : = <exp>
+//| if <lexp> then <statement>[else <statement>]
+//| while <lexp> do <statement>
+//| call <id>[£¨<exp>{, <exp>}£©]
+//| <body>
+//| read(<id>{£¬<id>})
+//| write(<exp>{, <exp>})
+{
+    switch (lookahead.tokenType)
+    {
+        case CodeTokenType::Id:
+            break;
+        case CodeTokenType::If:
+            break;
+        case CodeTokenType::While:
+            break;
+        case CodeTokenType::Call:
+            break;
+        case CodeTokenType::Begin:
+            break;
+        case CodeTokenType::Read:
+            break;
+        case CodeTokenType::Write:
+            break;
+        default:
+            break;
+    }
+}
+
+shared_ptr<Expr> Parser::expr()
+// <exp> ¡ú [+|-]<term>{<aop><term>}
+{
+    return shared_ptr<Expr>();
+}
+
+shared_ptr<Expr> Parser::term()
+// <term> ¡ú <factor>{<mop><factor>}
+{
+    return shared_ptr<Expr>();
+}
+
+shared_ptr<Expr> Parser::factor()
+// <factor>¡ú<id> | <integer> | (<exp>)
+{
+    return shared_ptr<Expr>();
+}
+
 void Parser::match(CodeTokenType tokenType)
 {
     if (lookahead.tokenType == tokenType) {

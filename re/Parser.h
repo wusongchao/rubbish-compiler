@@ -23,6 +23,14 @@ private:
 
     void vardecls();
 
+    shared_ptr<Stmt> stmt();
+
+    shared_ptr<Expr> expr();
+
+    shared_ptr<Expr> term();
+
+    shared_ptr<Expr> factor();
+
     void syntaxError(const char* str)
     {
         throw SyntaxError(str);
