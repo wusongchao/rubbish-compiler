@@ -4,6 +4,7 @@
 #include "RegularExpression.h"
 #include "NFAConvertHelper.h"
 #include "Scanner.h"
+#include "Parser.h"
 
 using std::cin;
 using std::cout;
@@ -12,9 +13,8 @@ using std::unordered_set;
 using std::make_shared;
 using std::istringstream;
 
-int main()
+void defineTokens(Lexicon& lexicon)
 {
-    Lexicon lexicon;
     lexicon.defineToken(literal("program"), CodeTokenType::Program);
     lexicon.defineToken(literal("const"), CodeTokenType::Const);
     lexicon.defineToken(literal("var"), CodeTokenType::Var);
@@ -67,29 +67,48 @@ int main()
     lexicon.defineToken(new OrExpression(symbol('\n'), literal("\r\n")), CodeTokenType::LineBreaker);
     lexicon.defineToken(
         new CatExpression(
-            literal("//"), 
+            literal("//"),
             new StarExpression(visibleChars())
         ),
         CodeTokenType::Comment
     );
+}
 
 
-    istream& stream = istringstream(
-        "program fuck;"
-        "begin\n"
-        "if i = 4 then\n"
-        "t = 342+5\n"
-        "//fuck you\n"
-        "end"
+int main()
+{
+    Lexicon lexicon;
+
+    defineTokens(lexicon);
+
+    //istringstream stringStream(
+    //    "program fuck;"
+    //    "begin\n"
+    //    "if i = 4 then\n"
+    //    "t = 342+5\n"
+    //    "//fuck you\n"
+    //    "end"
+    //);
+    istringstream stringStream(
+        "program fuck;\n"
+        "const id := 1\n"
+        "var a, b\n"
     );
+
+    istream& stream = stringStream;
+
     Scanner scanner(stream, lexicon.createScannerInfo());
     scanner.addSkipToken(CodeTokenType::WhiteSpace);
     scanner.addSkipToken(CodeTokenType::LineBreaker);
     scanner.addSkipToken(CodeTokenType::Comment);
-    while (!scanner.isFinish()) {
-        CodeToken token = scanner.read();
-        cout << (int)token.tokenType << ' ' << token.value << ' ' << token.rowIndex << endl;
-    }
+    
+    Parser parser(scanner);
+
+    auto p = parser.program();
+    //while (!scanner.isFinish()) {
+    //    CodeToken token = scanner.read();
+    //    cout << (int)token.tokenType << ' ' << token.value << ' ' << token.rowIndex << endl;
+    //}
 
     //token = scanner.read();
     //cout << (int)token.tokenType << endl;

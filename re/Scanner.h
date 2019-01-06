@@ -16,6 +16,8 @@ public:
         skipTokens.insert(tokenType);
     }
 
+    // The behaviour when eof
+    // please see the comment in definition
     CodeToken read();
 
     bool isFinish()

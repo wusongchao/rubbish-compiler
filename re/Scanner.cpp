@@ -14,6 +14,12 @@ Scanner::Scanner(istream & stream, ScannerInfo && scannerInfo)
 
 CodeToken Scanner::read()
 {
+    if (finish) {
+        // why return an EOF token instead of throw a exception?
+        // to keep similar behaviour as istream
+        return{ CodeTokenType::Eof , "", currentRow };
+    }
+
     int state = 1;
     int lastState = 0;
     

@@ -114,8 +114,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Ast.h" />
+    <ClInclude Include="AstVisitor.h" />
     <ClInclude Include="CodeToken.h" />
     <ClInclude Include="DFAModel.h" />
+    <ClInclude Include="Env.h" />
+    <ClInclude Include="errors\Error.h" />
+    <ClInclude Include="Expr.h" />
     <ClInclude Include="FixedMemoryPool.h" />
     <ClInclude Include="Lexicon.h" />
     <ClInclude Include="NFAConvertHelper.h" />
@@ -124,18 +128,26 @@
     <ClInclude Include="RegularExpression.h" />
     <ClInclude Include="RegularExpressionConverter.h" />
     <ClInclude Include="Scanner.h" />
+    <ClInclude Include="Type.h" />
     <ClInclude Include="UtilMethods.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Ast.cpp" />
+    <ClCompile Include="AstVisitor.cpp" />
     <ClCompile Include="CodeToken.cpp" />
     <ClCompile Include="DFAModel.cpp" />
+    <ClCompile Include="Env.cpp" />
+    <ClCompile Include="errors\Error.cpp" />
+    <ClCompile Include="Expr.cpp" />
     <ClCompile Include="Lexicon.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NFAModel.cpp" />
     <ClCompile Include="NFAConvertHelper.cpp" />
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="RegularExpression.cpp" />
     <ClCompile Include="RegularExpressionConverter.cpp" />
     <ClCompile Include="Scanner.cpp" />
+    <ClCompile Include="Type.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -86,15 +86,16 @@ namespace UnitTest1
                 CodeTokenType::Comment
             );
 
-
-            istream& stream = istringstream(
+            istringstream stringStream(
                 "program fuck;"
                 "begin\n"
                 "if i = 4 then\n"
-                "t := 342+5\n"
+                "t = 342+5\n"
                 "//fuck you\n"
                 "end"
             );
+            istream& stream = stringStream;
+
             Scanner scanner(stream, lexicon.createScannerInfo());
             scanner.addSkipToken(CodeTokenType::WhiteSpace);
             scanner.addSkipToken(CodeTokenType::LineBreaker);
