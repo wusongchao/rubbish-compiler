@@ -23,11 +23,21 @@ private:
 
     void vardecls();
 
+    ExprNode boolExpr();
+
+    ExprNode join();
+
+    ExprNode equality();
+
+    ExprNode rel();
+
     shared_ptr<Stmt> stmt();
 
     shared_ptr<Expr> expr();
 
     shared_ptr<Expr> term();
+
+    shared_ptr<Expr> unary();
 
     shared_ptr<Expr> factor();
 

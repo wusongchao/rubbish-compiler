@@ -30,22 +30,25 @@ enum class CodeTokenType {
     Float,
 
     //operator
+    Not,                // !
+    And,                // &&
+    Or,                 // ||
     LT,					// <
     GT,					// >
     LE,					// <=
     GE,					// >=
     EQ,					// =
     NE,					// <>
-    Assign,             // :=  26
+    Assign,             // :=  29
     Add,				// +  
     Sub,				// -
     Mul,				// *
     Div,				// / 
     Mod,				// %
-    OpenParenthesis,		// (  32
+    OpenParenthesis,		// (  35
     CloseParenthesis,		// )
     Comma,				//,
-    Semicolon,				//;  35
+    Semicolon,				//;  38
 
     WhiteSpace,
     LineBreaker,    // \n or \r\n

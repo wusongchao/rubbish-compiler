@@ -20,11 +20,14 @@ public:
     {
         constant = cond;
     }
+
+    Type type;
 private:
     CodeToken token;
-    Type type;
     bool constant = false;
 };
+
+using ExprNode = shared_ptr<Expr>;
 
 class Id : public Expr {
 public:

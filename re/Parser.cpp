@@ -1,5 +1,7 @@
 #include "Parser.h"
 #include "Expr.h"
+#include "Op.h"
+#include "Logical.h"
 #include <iostream>
 
 using std::make_shared;
@@ -143,16 +145,92 @@ shared_ptr<Stmt> Parser::stmt()
     return nullptr;
 }
 
+ExprNode Parser::boolExpr()
+{
+    auto x{ join() };
+    while (lookahead.tokenType == CodeTokenType::Or) {
+        CodeToken token = lookahead;
+        move();
+        x = make_shared<Or>(token, x, join());
+    }
+    return x;
+}
+
+ExprNode Parser::join()
+{
+    auto x{ equality() };
+    while (lookahead.tokenType == CodeTokenType::And) {
+        CodeToken token = lookahead;
+        move();
+        x = make_shared<And>(token, x, equality());
+    }
+    return x;
+}
+
+ExprNode Parser::equality()
+{
+    auto x{ rel() };
+    while (lookahead.tokenType == CodeTokenType::EQ || lookahead.tokenType == CodeTokenType::NE) {
+        CodeToken token = lookahead;
+        move();
+        x = make_shared<Rel>(token, x, rel());
+    }
+    return x;
+}
+
+ExprNode Parser::rel()
+{
+    auto x{ expr() };
+    switch (lookahead.tokenType)
+    {
+        case CodeTokenType::LT:
+        case CodeTokenType::LE:
+        case CodeTokenType::GT:
+        case CodeTokenType::GE:
+            CodeToken token = lookahead;
+            move();
+            x = make_shared<Rel>(token, x, expr());
+    }
+    return x;
+}
+
 shared_ptr<Expr> Parser::expr()
 // <exp> ¡ú [+|-]<term>{<aop><term>}
 {
+    auto x{ term() };
+    while (lookahead.tokenType == CodeTokenType::Add || lookahead.tokenType == CodeTokenType::Sub) {
+        CodeToken token = lookahead;
+        move();
+        x = make_shared<Arith>(token, x, term());
+    }
     return shared_ptr<Expr>();
 }
 
 shared_ptr<Expr> Parser::term()
 // <term> ¡ú <factor>{<mop><factor>}
 {
-    return shared_ptr<Expr>();
+    auto x{ unary() };
+    while (lookahead.tokenType == CodeTokenType::Mul || lookahead.tokenType == CodeTokenType::Div) {
+        CodeToken token = lookahead;
+        move();
+        x = make_shared<Arith>(token, x, unary());
+    }
+}
+
+shared_ptr<Expr> Parser::unary()
+// import a new procedure unary
+{
+    if (lookahead.tokenType == CodeTokenType::Sub) {
+        CodeToken token = lookahead;
+        move();
+        return make_shared<Unary>(token, unary());
+    } else if (lookahead.tokenType == CodeTokenType::Not) {
+        CodeToken token = lookahead;
+        move();
+        return make_shared<Not>(token, unary());
+    } else {
+        return factor();
+    }
 }
 
 shared_ptr<Expr> Parser::factor()

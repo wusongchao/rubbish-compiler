@@ -51,6 +51,9 @@ void defineTokens(Lexicon& lexicon)
         CodeTokenType::Integer
     );
 
+    lexicon.defineToken(symbol('!'), CodeTokenType::Not);
+    lexicon.defineToken(symbol('&&'), CodeTokenType::And);
+    lexicon.defineToken(symbol('||'), CodeTokenType::Or);
     lexicon.defineToken(symbol('<'), CodeTokenType::LT);
     lexicon.defineToken(symbol('>'), CodeTokenType::GT);
     lexicon.defineToken(literal("<="), CodeTokenType::LE);
