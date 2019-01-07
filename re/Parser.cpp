@@ -78,17 +78,18 @@ void Parser::condecl()
     {
         case CodeTokenType::True:
             match(CodeTokenType::True);
-            top->putSymbol(id, make_shared<Id>(id, Type::Bool, true));
+            top->putSymbol(id, make_shared<Id>(id, Type::Bool, usedOffset, true));
+            // need not to update the usedOffset
             constTop->putSymbol(id, make_shared<Constant>(constant, Type::Bool));
             break;
         case CodeTokenType::False:
             match(CodeTokenType::False);
-            top->putSymbol(id, make_shared<Id>(id, Type::Bool, true));
+            top->putSymbol(id, make_shared<Id>(id, Type::Bool, usedOffset, true));
             constTop->putSymbol(id, make_shared<Constant>(constant, Type::Bool));
             break;
         case CodeTokenType::Integer:
             match(CodeTokenType::Integer);
-            top->putSymbol(id, make_shared<Id>(id, Type::Int, true));
+            top->putSymbol(id, make_shared<Id>(id, Type::Int, usedOffset, true));
             constTop->putSymbol(id, make_shared<Constant>(constant, Type::Int));
             break;
         default:
@@ -106,14 +107,17 @@ void Parser::vardecls()
     match(CodeTokenType::Var);
     CodeToken token = lookahead;
     match(CodeTokenType::Id);
-    auto id{ make_shared<Id>(token, Type::Int) };
+    auto id{ make_shared<Id>(token, Type::Int, usedOffset) };
     top->putSymbol(token, id);
+    usedOffset = usedOffset + id->type.width;
+
     while (lookahead.tokenType == CodeTokenType::Comma) {
         match(CodeTokenType::Comma);
         CodeToken token = lookahead;
         match(CodeTokenType::Id);
-        auto id{ make_shared<Id>(token, Type::Int) };
+        auto id{ make_shared<Id>(token, Type::Int, usedOffset) };
         top->putSymbol(token, id);
+        usedOffset = usedOffset + id->type.width;
     }
 }
 

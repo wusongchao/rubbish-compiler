@@ -74,4 +74,6 @@ private:
     CodeToken lookahead;
     shared_ptr<Env> top{ nullptr };
     shared_ptr<ConstEnv> constTop{ nullptr };
+
+    int usedOffset = 0;
 };

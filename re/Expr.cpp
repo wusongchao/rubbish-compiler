@@ -19,13 +19,13 @@ void Expr::accept(AstVisitor & visitor)
     return visitor.visitExpr(static_pointer_cast<Expr>(shared_from_this()));
 }
 
-Id::Id(const CodeToken & token, const Type& type, bool constant)
-    :Expr(token, type, constant)
+Id::Id(const CodeToken & token, const Type& type, int offset, bool constant)
+    :Expr(token, type, constant), offset(offset)
 {
 }
 
-Id::Id(CodeToken && token, const Type& type, bool constant)
-    :Expr(std::move(token), type, constant)
+Id::Id(CodeToken && token, const Type& type, int offset, bool constant)
+    :Expr(std::move(token), type, constant), offset(offset)
 {
 }
 

@@ -31,9 +31,11 @@ using ExprNode = shared_ptr<Expr>;
 
 class Id : public Expr {
 public:
-    Id(const CodeToken& token, const Type& type, bool constant = false);
+    Id(const CodeToken& token, const Type& type, int offset, bool constant = false);
 
-    Id(CodeToken&& token, const Type& type, bool constant = false);
+    Id(CodeToken&& token, const Type& type, int offset, bool constant = false);
+
+    int offset;
 };
 
 class Constant : public Expr {

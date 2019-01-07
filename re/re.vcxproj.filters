@@ -124,5 +124,11 @@
     <ClInclude Include="Logical.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="IR.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="IRGenerator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

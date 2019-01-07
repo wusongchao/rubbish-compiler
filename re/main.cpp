@@ -102,7 +102,7 @@ int main()
     //    "var a, b\n"
     //);
     istringstream stringStream(
-        "odd (2+3)\n"
+        "4+5+1+(3-5)*2*(1)\n"
     );
 
     istream& stream = stringStream;

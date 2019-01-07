@@ -10,10 +10,3 @@ public:
 
     virtual void visitExpr(shared_ptr<Expr> expr) = 0;
 };
-
-class IRGenerator : public AstVisitor {
-public:
-
-private:
-    
-};

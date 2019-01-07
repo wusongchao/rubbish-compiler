@@ -121,6 +121,8 @@
     <ClInclude Include="errors\Error.h" />
     <ClInclude Include="Expr.h" />
     <ClInclude Include="FixedMemoryPool.h" />
+    <ClInclude Include="IR.h" />
+    <ClInclude Include="IRGenerator.h" />
     <ClInclude Include="Lexicon.h" />
     <ClInclude Include="Logical.h" />
     <ClInclude Include="NFAConvertHelper.h" />
