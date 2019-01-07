@@ -29,6 +29,10 @@ void defineTokens(Lexicon& lexicon)
     lexicon.defineToken(literal("call"), CodeTokenType::Call);
     lexicon.defineToken(literal("read"), CodeTokenType::Read);
     lexicon.defineToken(literal("write"), CodeTokenType::Write);
+    lexicon.defineToken(literal("odd"), CodeTokenType::Odd);
+
+    lexicon.defineToken(literal("true"), CodeTokenType::True);
+    lexicon.defineToken(literal("false"), CodeTokenType::False);
 
     lexicon.defineToken(
         new CatExpression(

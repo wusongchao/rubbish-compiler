@@ -31,14 +31,24 @@ private:
 
     shared_ptr<Expr> factor();
 
-    void syntaxError(const char* str)
+    void syntaxError(const string& str)
     {
         throw SyntaxError(str);
     }
 
-    void semanticError(const char* str)
+    void syntaxError(string&& str)
+    {
+        throw SyntaxError(std::move(str));
+    }
+
+    void semanticError(const string& str)
     {
         throw SemanticError(str);
+    }
+
+    void semanticError(string& str)
+    {
+        throw SemanticError(std::move(str));
     }
 
     void move() {
@@ -49,5 +59,5 @@ private:
 
     Scanner& scanner;
     CodeToken lookahead;
-    unique_ptr<Env> top{ nullptr };
+    shared_ptr<Env> top{ nullptr };
 };

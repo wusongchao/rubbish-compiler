@@ -1,6 +1,6 @@
 #include "Env.h"
 
-Env::Env(unique_ptr<Env> prev)
-    :prev(std::move(prev))
+Env::Env(shared_ptr<Env> prev)
+    :prev(prev)
 {
 }

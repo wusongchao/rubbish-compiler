@@ -11,7 +11,7 @@ using std::string;
 
 class Env {
 public:
-    Env(unique_ptr<Env> prev);
+    Env(shared_ptr<Env> prev);
 
     void putSymbol(const CodeToken& token, shared_ptr<Id> id) {
         table.insert({ token.value, id });
@@ -32,7 +32,7 @@ public:
     }
 
 private:
-    unique_ptr<Env> prev{ nullptr };
+    shared_ptr<Env> prev{ nullptr };
 
     unordered_map<string, shared_ptr<Id>> table;
 };

@@ -3,6 +3,7 @@
 #include <iostream>
 
 using std::make_shared;
+using std::to_string;
 
 shared_ptr<Program> Parser::program()
 // <program> ¡ú program <id>;<block>
@@ -28,15 +29,14 @@ shared_ptr<Stmt> Parser::block()
     // we can ensure that in the lifetime of this procedure
     // top will not be destructed
     // so the reference to savedEnv is valid
-    Env* savedEnv = top.get();
+    auto savedEnv{ top };
     // add a local handler for old top
-    //top = make_unique<Env>(top);
-    top = std::move(unique_ptr<Env>(new Env(std::move(top))));
+    top = make_shared<Env>(top);
 
     condecls();
     vardecls();
 
-    top.reset(savedEnv);
+    top = savedEnv;
     return nullptr;
     //return shared_ptr<Stmt>();
 }
@@ -116,6 +116,7 @@ shared_ptr<Stmt> Parser::stmt()
         default:
             break;
     }
+    return nullptr;
 }
 
 shared_ptr<Expr> Parser::expr()
@@ -138,18 +139,30 @@ shared_ptr<Expr> Parser::factor()
         case CodeTokenType::Id:
         {
             CodeToken token = lookahead;
-            match(CodeTokenType::Integer);
-            auto beReferenced = top->getSymbol(token);
-            if (beReferenced == nullptr) {
-                semanticError("reference to undefined identifier");
+            auto id = top->getSymbol(token);
+            if (id == nullptr) {
+                semanticError("reference to undefined identifier: " + token.value + "in line:" + to_string(token.rowIndex));
             }
-            
+            match(CodeTokenType::Id);
+            return id;
         }
         case CodeTokenType::Integer:
         {
             CodeToken token = lookahead;
             match(CodeTokenType::Integer);
             return make_shared<Constant>(std::move(token), Type::Int);
+        }
+        case CodeTokenType::True:
+        {
+            CodeToken token = lookahead;
+            match(CodeTokenType::True);
+            return make_shared<Constant>(std::move(token), Type::Bool);
+        }
+        case CodeTokenType::False:
+        {
+            CodeToken token = lookahead;
+            match(CodeTokenType::False);
+            return make_shared<Constant>(std::move(token), Type::Bool);
         }
         case CodeTokenType::OpenParenthesis:
         {
@@ -159,9 +172,10 @@ shared_ptr<Expr> Parser::factor()
             return res;
         }
         default:
+            SyntaxError(string("syntax Error near line: ") + to_string(lookahead.rowIndex));
             break;
     }
-    return shared_ptr<Expr>();
+    return nullptr;
 }
 
 void Parser::match(CodeTokenType tokenType)
@@ -169,6 +183,6 @@ void Parser::match(CodeTokenType tokenType)
     if (lookahead.tokenType == tokenType) {
         move();
     } else {
-        syntaxError("wrong token");
+        syntaxError("expect wrong token type near line: " + to_string(lookahead.rowIndex));
     }
 }

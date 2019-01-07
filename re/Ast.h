@@ -15,6 +15,8 @@ public:
     virtual void accept(AstVisitor& visitor) = 0;
 };
 
+using AstNode = shared_ptr<Ast>;
+
 class Program : public Ast {
 public:
     virtual void accept(AstVisitor& visitor) override;

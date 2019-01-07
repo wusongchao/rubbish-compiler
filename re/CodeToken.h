@@ -22,8 +22,10 @@ enum class CodeTokenType {
     Read,
     Write,
     Odd,
+    True,
+    False,
 
-    Id,                 // identifier 15
+    Id,                 // identifier 17
     Integer,
     Float,
 
@@ -34,16 +36,16 @@ enum class CodeTokenType {
     GE,					// >=
     EQ,					// =
     NE,					// <>
-    Assign,             // :=  24
+    Assign,             // :=  26
     Add,				// +  
     Sub,				// -
     Mul,				// *
     Div,				// / 
     Mod,				// %
-    OpenParenthesis,		// (  30
+    OpenParenthesis,		// (  32
     CloseParenthesis,		// )
     Comma,				//,
-    Semicolon,				//;  33
+    Semicolon,				//;  35
 
     WhiteSpace,
     LineBreaker,    // \n or \r\n
