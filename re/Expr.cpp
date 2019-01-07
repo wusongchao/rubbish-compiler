@@ -14,7 +14,7 @@ Expr::Expr(CodeToken && token, const Type& type, bool constant)
 {
 }
 
-void Expr::accept(AstVisitor & visitor)
+AstNode Expr::accept(AstVisitor & visitor)
 {
     return visitor.visitExpr(static_pointer_cast<Expr>(shared_from_this()));
 }

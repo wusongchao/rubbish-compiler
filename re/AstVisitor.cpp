@@ -1,6 +1,6 @@
 #include "AstVisitor.h"
 
-void AstVisitor::visit(shared_ptr<Ast> astNode)
+AstNode AstVisitor::visit(AstNode astNode)
 {
-    astNode->accept(*this);
+    return astNode->accept(*this);
 }

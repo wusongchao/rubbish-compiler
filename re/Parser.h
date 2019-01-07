@@ -59,7 +59,7 @@ private:
         throw SemanticError(str);
     }
 
-    void semanticError(string& str)
+    void semanticError(string&& str)
     {
         throw SemanticError(std::move(str));
     }

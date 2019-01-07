@@ -10,16 +10,17 @@ class AstVisitor;
 // abstract syntax tree
 // enable_shared_from_this is needed
 // since sometimes the class have to return a shared_ptr(this)
+
 class Ast : public enable_shared_from_this<Ast> {
 public:
-    virtual void accept(AstVisitor& visitor) = 0;
+    virtual shared_ptr<Ast> accept(AstVisitor& visitor) = 0;
 };
 
 using AstNode = shared_ptr<Ast>;
 
 class Program : public Ast {
 public:
-    virtual void accept(AstVisitor& visitor) override;
+    virtual AstNode accept(AstVisitor& visitor) override;
 
 private:
 };

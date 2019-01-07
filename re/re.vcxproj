@@ -143,6 +143,7 @@
     <ClCompile Include="Env.cpp" />
     <ClCompile Include="errors\Error.cpp" />
     <ClCompile Include="Expr.cpp" />
+    <ClCompile Include="IR.cpp" />
     <ClCompile Include="Lexicon.cpp" />
     <ClCompile Include="Logical.cpp" />
     <ClCompile Include="main.cpp" />

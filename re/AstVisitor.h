@@ -4,9 +4,9 @@
 
 class AstVisitor {
 public:
-    virtual void visit(shared_ptr<Ast> astNode);
+    virtual AstNode visit(AstNode astNode);
 
-    virtual void visitProgram(shared_ptr<Program> program) = 0;
+    virtual shared_ptr<Program> visitProgram(shared_ptr<Program> program) = 0;
 
-    virtual void visitExpr(shared_ptr<Expr> expr) = 0;
+    virtual ExprNode visitExpr(ExprNode expr) = 0;
 };

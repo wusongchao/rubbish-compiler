@@ -1,4 +1,8 @@
 #pragma once
+#include <string>
+#include "Expr.h"
+
+using std::string;
 
 enum class Opcode {
     Add, 
@@ -16,11 +20,19 @@ enum class Opcode {
 };
 
 struct Var {
-
+    bool isTemp = false;
+    shared_ptr<Expr> variable;
 };
 
+string toString(Opcode opcode);
+
+// (op, src1, src2, dest)
 struct Quad {
     Opcode op;
 
+    Var src1;
+    Var src2;
+    Var dest;
 
+    string toString();
 };

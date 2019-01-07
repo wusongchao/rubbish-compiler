@@ -65,6 +65,9 @@
     <ClCompile Include="Logical.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="IR.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FixedMemoryPool.h">

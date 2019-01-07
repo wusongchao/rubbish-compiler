@@ -18,11 +18,24 @@ public:
         return labels;
     }
 
-    void visitExpr(ExprNode expr) override;
+    int defineLabel() {
+        labels.push_back(0);
+
+        // L0 is a special label
+        // label starts from L1
+        return labels.size();
+    }
+
+    void markLabel(int label) {
+        labels[label] = quads.size();
+    }
+
+    ExprNode visitExpr(ExprNode expr) override;
 
 private:
     vector<Quad> quads;
     vector<int> labels;
+    // label number -> offset address
     // L1:L3:
     //   i = i + 1
     // L5: 

@@ -9,7 +9,7 @@ public:
 
     Expr(CodeToken&& token, const Type& type, bool constant = false);
 
-    void accept(AstVisitor& visitor) override;
+    AstNode accept(AstVisitor& visitor) override;
 
     bool isConstant()
     {
