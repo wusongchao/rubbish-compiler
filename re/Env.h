@@ -36,3 +36,34 @@ private:
 
     unordered_map<string, shared_ptr<Id>> table;
 };
+
+class ConstEnv{
+public:
+    ConstEnv(shared_ptr<ConstEnv> prev);
+
+    void putSymbol(const CodeToken& token, shared_ptr<Constant> constant) {
+        table.insert({ token.value, constant });
+    }
+
+    void putSymbol(const string& name, shared_ptr<Constant> constant) {
+        table.insert({ name, constant });
+    }
+
+    shared_ptr<Constant> getSymbol(const CodeToken& token) {
+        ConstEnv* cur = this;
+        auto endIter = table.end();
+        while (cur != nullptr) {
+            auto it = table.find(token.value);
+            if (it != endIter) {
+                return it->second;
+            }
+            cur = cur->prev.get();
+        }
+
+        return nullptr;
+    }
+private:
+    shared_ptr<ConstEnv> prev{ nullptr };
+
+    unordered_map<string, shared_ptr<Constant>> table;
+};

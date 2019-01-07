@@ -11,7 +11,13 @@ shared_ptr<Program> Parser::program()
     match(CodeTokenType::Program);
     match(CodeTokenType::Id);
     match(CodeTokenType::Semicolon);
-    auto stmt{ block() };
+    try{
+        auto stmt{ block() };
+    }
+    catch (CompileError& error) {
+        throw;
+    }
+    
 
     return nullptr;
 }
@@ -33,10 +39,15 @@ shared_ptr<Stmt> Parser::block()
     // add a local handler for old top
     top = make_shared<Env>(top);
 
+    auto savedConstEnv{ constTop };
+    constTop = make_shared<ConstEnv>(constTop);
+
+
     condecls();
     vardecls();
 
     top = savedEnv;
+    constTop = savedConstEnv;
     return nullptr;
     //return shared_ptr<Stmt>();
 }
@@ -59,12 +70,30 @@ void Parser::condecls()
 void Parser::condecl()
 // <const> ¡ú <id>:=<integer>
 {
-    CodeToken token = lookahead;
+    CodeToken id = lookahead;
     match(CodeTokenType::Id);
     match(CodeTokenType::Assign);
-    match(CodeTokenType::Integer);
-    auto id{ make_shared<Id>(token, Type::Int, true) };
-    top->putSymbol(token, id); 
+    CodeToken constant = lookahead;
+    switch (lookahead.tokenType)
+    {
+        case CodeTokenType::True:
+            match(CodeTokenType::True);
+            top->putSymbol(id, make_shared<Id>(id, Type::Bool, true));
+            constTop->putSymbol(id, make_shared<Constant>(constant, Type::Bool));
+            break;
+        case CodeTokenType::False:
+            match(CodeTokenType::False);
+            top->putSymbol(id, make_shared<Id>(id, Type::Bool, true));
+            constTop->putSymbol(id, make_shared<Constant>(constant, Type::Bool));
+            break;
+        case CodeTokenType::Integer:
+            match(CodeTokenType::Integer);
+            top->putSymbol(id, make_shared<Id>(id, Type::Int, true));
+            constTop->putSymbol(id, make_shared<Constant>(constant, Type::Int));
+            break;
+        default:
+            syntaxError("invalid constant declaration expression");
+    }; 
 }
 
 void Parser::vardecls()

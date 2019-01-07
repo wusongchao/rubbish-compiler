@@ -31,6 +31,8 @@ private:
 
     shared_ptr<Expr> factor();
 
+    shared_ptr<Constant> createConstantExpression(CodeTokenType type, shared_ptr<Expr>, shared_ptr<Expr>);
+
     void syntaxError(const string& str)
     {
         throw SyntaxError(str);
@@ -60,4 +62,5 @@ private:
     Scanner& scanner;
     CodeToken lookahead;
     shared_ptr<Env> top{ nullptr };
+    shared_ptr<ConstEnv> constTop{ nullptr };
 };
