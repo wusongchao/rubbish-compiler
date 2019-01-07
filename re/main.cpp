@@ -5,6 +5,7 @@
 #include "NFAConvertHelper.h"
 #include "Scanner.h"
 #include "Parser.h"
+#include <fstream>
 
 using std::cin;
 using std::cout;
@@ -84,6 +85,23 @@ void defineTokens(Lexicon& lexicon)
 
 int main()
 {
+
+
+	Lexicon lexicon;
+	std::ifstream infile("Stmt.txt");
+	if (!infile.is_open())
+	{
+		cout << "can`t open file testStmt.txt" << endl;
+	}
+	istream& stream = infile;
+	Scanner scanner(stream, lexicon.createScannerInfo());
+	scanner.addSkipToken(CodeTokenType::WhiteSpace);
+	scanner.addSkipToken(CodeTokenType::LineBreaker);
+	scanner.addSkipToken(CodeTokenType::Comment);
+
+	Parser parser(scanner);
+	parser.program();
+	/*
     Lexicon lexicon;
 
     defineTokens(lexicon);
@@ -129,5 +147,7 @@ int main()
     //token = scanner.read();
     //cout << (int)token.tokenType << endl;
     cin.get();
+
+	*/
     return 0;
 }

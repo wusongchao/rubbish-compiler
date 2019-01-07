@@ -3,6 +3,8 @@
 #include "Op.h"
 #include "Logical.h"
 #include <iostream>
+#include <vector>
+
 
 using std::make_shared;
 using std::to_string;
@@ -11,13 +13,10 @@ using std::stoi;
 shared_ptr<Program> Parser::program()
 // <program> ¡ú program <id>;<block>
 {
-    //match(CodeTokenType::Program);
-    //match(CodeTokenType::Id);
-    //match(CodeTokenType::Semicolon);
-    
-    //auto stmt{ block() };
-    auto exprNode{ expr() };
-    std::cout << exprNode->token.value << std::endl;
+    match(CodeTokenType::Program);
+    match(CodeTokenType::Id);
+    match(CodeTokenType::Semicolon);
+	block();
 
     return nullptr;
 }
@@ -45,9 +44,13 @@ shared_ptr<Stmt> Parser::block()
 
     condecls();
     vardecls();
-
+	
     top = savedEnv;
     constTop = savedConstEnv;
+
+	body();
+
+
     return nullptr;
     //return shared_ptr<Stmt>();
 }
@@ -133,21 +136,108 @@ shared_ptr<Stmt> Parser::stmt()
     switch (lookahead.tokenType)
     {
         case CodeTokenType::Id:
+		{
+			CodeToken token = lookahead;
+			match(CodeTokenType::Id);
+			shared_ptr<Id> id = top->getSymbol(token);
+			if (id == nullptr) {
+				semanticError("reference to undefined identifier: " + token.value + "in line:" + to_string(token.rowIndex));
+			}
+			ExprNode exp = expr();
+			return make_shared<Assign>(id, exp);
+		}
             break;
         case CodeTokenType::If:
+		{
+			match(CodeTokenType::If);
+			ExprNode lexp = boolExpr();
+			match(CodeTokenType::Then);
+			StmtNode s1 = stmt();
+			CodeToken token = lookahead;
+			if (lookahead.tokenType == CodeTokenType::Else) {
+				StmtNode s2 = stmt();
+				return make_shared<If>(lexp, s1, s2);
+			}
+			return make_shared<If>(lexp, s1);
+		}
             break;
         case CodeTokenType::While:
+		{
+			match(CodeTokenType::While);
+			ExprNode lexp = boolExpr();
+			match(CodeTokenType::Do);
+			StmtNode s = stmt();
+			return make_shared<While>(lexp, s);
+		}
             break;
         case CodeTokenType::Call:
+		{
+			match(CodeTokenType::Call);
+			CodeToken token = lookahead;
+			match(CodeTokenType::Id);
+			auto id = top->getSymbol(token);
+			if (id == nullptr) {
+				semanticError("function undefined identifier: " + token.value + "in line:" + to_string(token.rowIndex));
+			}
+
+			///
+		}
             break;
         case CodeTokenType::Begin:
+		{
+			return body();
+		}
             break;
         case CodeTokenType::Read:
+		{
+			match(CodeTokenType::Read);
+			match(CodeTokenType::OpenParenthesis);
+			CodeToken token;
+			auto ids = std::vector< shared_ptr<Id> >();
+			do
+			{
+				token = lookahead;
+				match(CodeTokenType::Id);
+				auto id = top->getSymbol(token);
+				if (id == nullptr) {
+					semanticError("reference to undefined identifier: " + token.value + "in line:" + to_string(token.rowIndex));
+				}
+				auto ids = std::vector< shared_ptr<Id> >();
+				ids.push_back(id);
+				token = lookahead;
+				move();
+			}while (token.tokenType == CodeTokenType::Comma);
+			//match(CodeTokenType::CloseParenthesis);	moved in loop
+			if(token.tokenType!=CodeTokenType::CloseParenthesis)
+				SyntaxError(string("miss ')' in  line: ") + to_string(lookahead.rowIndex));
+			return make_shared<Read>(ids);
+
+		}
             break;
         case CodeTokenType::Write:
+		{
+			match(CodeTokenType::Write);
+			match(CodeTokenType::OpenParenthesis);
+			CodeToken token;
+			auto exprs = std::vector< ExprNode >();
+			do
+			{
+				auto exp = expr();
+				exprs.push_back(exp);
+				token = lookahead;
+				move();
+			} while (token.tokenType == CodeTokenType::CloseParenthesis);
+			if (token.tokenType != CodeTokenType::CloseParenthesis) {
+				SyntaxError(string("miss ')' in  line: ") + to_string(lookahead.rowIndex));
+			}
+			return make_shared< Write >(exprs);
+
+		}
             break;
         default:
-            break;
+		{
+			SyntaxError(string("syntax Error near line: ") + to_string(lookahead.rowIndex));
+		}
     }
     return nullptr;
 }
@@ -236,6 +326,24 @@ shared_ptr<Expr> Parser::expr()
         }
     }
     return x;
+}
+
+StmtNode Parser::body()
+{
+	//<body> ¡ú begin <statement>{;<statement>}end
+	match(CodeTokenType::Begin);
+	CodeToken token;
+	std::vector<StmtNode> stmtss = std::vector<StmtNode>();
+	do {
+		auto a_stmt = stmt();
+		stmtss.push_back(a_stmt);
+		token = lookahead;
+		move();
+	} while (token.tokenType == CodeTokenType::Semicolon);
+	if (token.tokenType != CodeTokenType::End) {
+		SyntaxError(string("miss 'end' in  line: ") + to_string(lookahead.rowIndex));
+	}
+	return make_shared<Body>(stmtss);
 }
 
 shared_ptr<Expr> Parser::term()

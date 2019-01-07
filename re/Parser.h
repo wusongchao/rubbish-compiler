@@ -5,7 +5,7 @@
 #include "Ast.h"
 #include "Env.h"
 #include "errors\Error.h"
-
+#include "Stmt.h"
 using std::unique_ptr;
 using std::shared_ptr;
 
@@ -31,7 +31,9 @@ private:
 
     ExprNode rel();
 
-    shared_ptr<Stmt> stmt();
+    StmtNode stmt();
+
+	StmtNode body();
 
     shared_ptr<Expr> expr();
 
