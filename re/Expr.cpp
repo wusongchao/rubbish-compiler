@@ -1,6 +1,9 @@
 #include "Expr.h"
 #include "AstVisitor.h"
 
+using std::make_shared;
+using std::to_string;
+
 Expr::Expr(const CodeToken & token, const Type& type, bool constant)
     :token(token), type(type), constant(constant)
 {
@@ -34,4 +37,25 @@ Constant::Constant(const CodeToken & token, const Type& type)
 Constant::Constant(CodeToken && token, const Type& type)
     :Expr(std::move(token), type, true)
 {
+}
+
+shared_ptr<Constant> Constant::createInteger(int i)
+{
+    return make_shared<Constant>(
+        CodeToken{CodeTokenType::Integer, to_string(i)}, Type::Int
+        );
+}
+
+shared_ptr<Constant> Constant::createBool(bool b)
+{
+    if (b == true) {
+        return make_shared<Constant>(
+            CodeToken{ CodeTokenType::True, "true" }, Type::Bool
+            );
+    } else {
+        return make_shared<Constant>(
+            CodeToken{ CodeTokenType::False, "false" }, Type::Bool
+            );
+    }
+
 }

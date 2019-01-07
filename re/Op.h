@@ -20,6 +20,7 @@ public:
 };
 
 class Unary : public Op {
+public:
     Unary(const CodeToken& token, ExprNode expr, bool constant = false);
 
     Unary(CodeToken&& token, ExprNode expr, bool constant = false);

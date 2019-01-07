@@ -22,8 +22,8 @@ public:
     }
 
     Type type;
-private:
     CodeToken token;
+private:
     bool constant = false;
 };
 
@@ -41,5 +41,9 @@ public:
     Constant(const CodeToken& token, const Type& type);
 
     Constant(CodeToken&& token, const Type& type);
+
+    shared_ptr<Constant> static createInteger(int i);
+
+    shared_ptr<Constant> static createBool(bool b);
 };
 

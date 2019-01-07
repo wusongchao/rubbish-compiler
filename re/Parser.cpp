@@ -6,15 +6,18 @@
 
 using std::make_shared;
 using std::to_string;
+using std::stoi;
 
 shared_ptr<Program> Parser::program()
 // <program> ¡ú program <id>;<block>
 {
-    match(CodeTokenType::Program);
-    match(CodeTokenType::Id);
-    match(CodeTokenType::Semicolon);
+    //match(CodeTokenType::Program);
+    //match(CodeTokenType::Id);
+    //match(CodeTokenType::Semicolon);
     
-    auto stmt{ block() };
+    //auto stmt{ block() };
+    auto exprNode{ expr() };
+    std::cout << exprNode->token.value << std::endl;
 
     return nullptr;
 }
@@ -151,7 +154,10 @@ ExprNode Parser::boolExpr()
     while (lookahead.tokenType == CodeTokenType::Or) {
         CodeToken token = lookahead;
         move();
-        x = make_shared<Or>(token, x, join());
+        x = foldConstant(token, x, join());
+        if (x == nullptr) {
+            x = make_shared<Or>(token, x, join());
+        }
     }
     return x;
 }
@@ -162,7 +168,10 @@ ExprNode Parser::join()
     while (lookahead.tokenType == CodeTokenType::And) {
         CodeToken token = lookahead;
         move();
-        x = make_shared<And>(token, x, equality());
+        x = foldConstant(token, x, equality());
+        if (x == nullptr) {
+            x = make_shared<And>(token, x, equality());
+        }
     }
     return x;
 }
@@ -173,7 +182,10 @@ ExprNode Parser::equality()
     while (lookahead.tokenType == CodeTokenType::EQ || lookahead.tokenType == CodeTokenType::NE) {
         CodeToken token = lookahead;
         move();
-        x = make_shared<Rel>(token, x, rel());
+        x = foldConstant(token, x, rel());
+        if (x == nullptr) {
+            x = make_shared<Rel>(token, x, rel());
+        }
     }
     return x;
 }
@@ -189,7 +201,10 @@ ExprNode Parser::rel()
         case CodeTokenType::GE:
             CodeToken token = lookahead;
             move();
-            x = make_shared<Rel>(token, x, expr());
+            x = foldConstant(token, x, expr());
+            if (x == nullptr) {
+                x = make_shared<Rel>(token, x, expr());
+            }
     }
     return x;
 }
@@ -201,9 +216,12 @@ shared_ptr<Expr> Parser::expr()
     while (lookahead.tokenType == CodeTokenType::Add || lookahead.tokenType == CodeTokenType::Sub) {
         CodeToken token = lookahead;
         move();
-        x = make_shared<Arith>(token, x, term());
+        x = foldConstant(token, x, term());
+        if (x == nullptr) {
+            x = make_shared<Arith>(token, x, term());
+        }
     }
-    return shared_ptr<Expr>();
+    return x;
 }
 
 shared_ptr<Expr> Parser::term()
@@ -213,8 +231,13 @@ shared_ptr<Expr> Parser::term()
     while (lookahead.tokenType == CodeTokenType::Mul || lookahead.tokenType == CodeTokenType::Div) {
         CodeToken token = lookahead;
         move();
-        x = make_shared<Arith>(token, x, unary());
+        x = foldConstant(token, x, unary());
+        if (x == nullptr) {
+            x = make_shared<Arith>(token, x, unary());
+        }
     }
+
+    return x;
 }
 
 shared_ptr<Expr> Parser::unary()
@@ -252,19 +275,19 @@ shared_ptr<Expr> Parser::factor()
         {
             CodeToken token = lookahead;
             match(CodeTokenType::Integer);
-            return make_shared<Constant>(std::move(token), Type::Int);
+            return make_shared<Constant>(token, Type::Int);
         }
         case CodeTokenType::True:
         {
             CodeToken token = lookahead;
             match(CodeTokenType::True);
-            return make_shared<Constant>(std::move(token), Type::Bool);
+            return make_shared<Constant>(token, Type::Bool);
         }
         case CodeTokenType::False:
         {
             CodeToken token = lookahead;
             match(CodeTokenType::False);
-            return make_shared<Constant>(std::move(token), Type::Bool);
+            return make_shared<Constant>(token, Type::Bool);
         }
         case CodeTokenType::OpenParenthesis:
         {
@@ -277,6 +300,86 @@ shared_ptr<Expr> Parser::factor()
             SyntaxError(string("syntax Error near line: ") + to_string(lookahead.rowIndex));
             break;
     }
+    return nullptr;
+}
+
+shared_ptr<Constant> Parser::foldConstant(const CodeToken& opToken, ExprNode expr)
+{
+    if (!expr->isConstant()) {
+        return nullptr;
+    }
+
+    CodeTokenType unaryOp = opToken.tokenType;
+
+    //auto constId{ constTop->getSymbol(expr->token) };
+    //if (constId != nullptr) {
+    //    expr = constId;
+    //}
+
+    if (unaryOp == CodeTokenType::Sub) {
+        return Constant::createInteger(-stoi(expr->token.value));
+    } else if (unaryOp == CodeTokenType::Not) {
+        if (expr->token.tokenType == CodeTokenType::True) {
+            return Constant::createBool(!true);
+        } else if (expr->token.tokenType == CodeTokenType::False) {
+            return Constant::createBool(!false);
+        } else {
+            return nullptr;
+        }
+    } else {
+        return nullptr;
+    }
+}
+
+shared_ptr<Constant> Parser::foldConstant(const CodeToken& opToken, ExprNode lhs, ExprNode rhs)
+{
+    if (!lhs->isConstant() || !rhs->isConstant()) {
+        return nullptr;
+    }
+
+    CodeTokenType op = opToken.tokenType;
+
+    //auto constLhsId{ constTop->getSymbol(lhs->token) };
+    //if (constLhsId != nullptr) {
+    //    lhs = constLhsId;
+    //}
+
+    //auto constRhsId{ constTop->getSymbol(rhs->token) };
+    //if (constRhsId != nullptr) {
+    //    rhs = constRhsId;
+    //}
+
+    switch (op) {
+        case CodeTokenType::And:
+        {
+            bool lhsValue = lhs->token.tokenType == CodeTokenType::True ? true : false;
+            bool rhsValue = rhs->token.tokenType == CodeTokenType::True ? true : false;
+            return Constant::createBool(lhsValue && rhsValue);
+        }
+        case CodeTokenType::Or:
+        {
+            bool lhsValue = lhs->token.tokenType == CodeTokenType::True ? true : false;
+            bool rhsValue = rhs->token.tokenType == CodeTokenType::True ? true : false;
+            return Constant::createBool(lhsValue || rhsValue);
+        }
+        case CodeTokenType::LT:
+            return Constant::createBool(stoi(lhs->token.value) < stoi(rhs->token.value));
+        case CodeTokenType::LE:
+            return Constant::createBool(stoi(lhs->token.value) <= stoi(rhs->token.value));
+        case CodeTokenType::GT:
+            return Constant::createBool(stoi(lhs->token.value) > stoi(rhs->token.value));
+        case CodeTokenType::GE:
+            return Constant::createBool(stoi(lhs->token.value) >= stoi(rhs->token.value));
+        case CodeTokenType::Add:
+            return Constant::createInteger(stoi(lhs->token.value) + stoi(rhs->token.value));
+        case CodeTokenType::Sub:
+            return Constant::createInteger(stoi(lhs->token.value) - stoi(rhs->token.value));
+        case CodeTokenType::Mul:
+            return Constant::createInteger(stoi(lhs->token.value) * stoi(rhs->token.value));
+        case CodeTokenType::Div:
+            return Constant::createInteger(stoi(lhs->token.value) / stoi(rhs->token.value));
+    }
+
     return nullptr;
 }
 

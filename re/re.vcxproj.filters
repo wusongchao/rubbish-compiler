@@ -59,6 +59,12 @@
     <ClCompile Include="Expr.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Op.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Logical.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FixedMemoryPool.h">
@@ -110,6 +116,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Expr.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Op.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Logical.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

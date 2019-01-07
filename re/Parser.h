@@ -41,7 +41,8 @@ private:
 
     shared_ptr<Expr> factor();
 
-    shared_ptr<Constant> createConstantExpression(CodeTokenType type, shared_ptr<Expr>, shared_ptr<Expr>);
+    shared_ptr<Constant> foldConstant(const CodeToken& opToken, ExprNode expr);
+    shared_ptr<Constant> foldConstant(const CodeToken& opToken, ExprNode lhs, ExprNode rhs);
 
     void syntaxError(const string& str)
     {

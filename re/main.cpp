@@ -96,10 +96,13 @@ int main()
     //    "//fuck you\n"
     //    "end"
     //);
+    //istringstream stringStream(
+    //    "program fuck;\n"
+    //    "const id := 1\n"
+    //    "var a, b\n"
+    //);
     istringstream stringStream(
-        "program fuck;\n"
-        "const id := 1\n"
-        "var a, b\n"
+        "1 + 2 * 3 - (4 + 13) * 5\n"
     );
 
     istream& stream = stringStream;
