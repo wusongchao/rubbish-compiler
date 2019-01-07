@@ -52,8 +52,8 @@ void defineTokens(Lexicon& lexicon)
     );
 
     lexicon.defineToken(symbol('!'), CodeTokenType::Not);
-    lexicon.defineToken(symbol('&&'), CodeTokenType::And);
-    lexicon.defineToken(symbol('||'), CodeTokenType::Or);
+    lexicon.defineToken(literal("&&"), CodeTokenType::And);
+    lexicon.defineToken(literal("||"), CodeTokenType::Or);
     lexicon.defineToken(symbol('<'), CodeTokenType::LT);
     lexicon.defineToken(symbol('>'), CodeTokenType::GT);
     lexicon.defineToken(literal("<="), CodeTokenType::LE);
@@ -102,7 +102,7 @@ int main()
     //    "var a, b\n"
     //);
     istringstream stringStream(
-        "1 + 2 * 3 - (4 + 13) * 5\n"
+        "odd (2+3)\n"
     );
 
     istream& stream = stringStream;

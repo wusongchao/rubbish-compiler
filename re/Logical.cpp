@@ -49,3 +49,13 @@ Rel::Rel(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
     : Logical(std::move(token), p1, p1, constant)
 {
 }
+
+Odd::Odd(const CodeToken & token, ExprNode expr, bool constant)
+    : Logical(token, expr, expr, constant)
+{
+}
+
+Odd::Odd(CodeToken && token, ExprNode expr, bool constant)
+    : Logical(std::move(token), expr, expr, constant)
+{
+}

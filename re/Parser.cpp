@@ -154,9 +154,11 @@ ExprNode Parser::boolExpr()
     while (lookahead.tokenType == CodeTokenType::Or) {
         CodeToken token = lookahead;
         move();
-        x = foldConstant(token, x, join());
+
+        auto joinNode{ join() };
+        x = foldConstant(token, x, joinNode);
         if (x == nullptr) {
-            x = make_shared<Or>(token, x, join());
+            x = make_shared<Or>(token, x, joinNode);
         }
     }
     return x;
@@ -168,9 +170,11 @@ ExprNode Parser::join()
     while (lookahead.tokenType == CodeTokenType::And) {
         CodeToken token = lookahead;
         move();
-        x = foldConstant(token, x, equality());
+
+        auto equalNode{ equality() };
+        x = foldConstant(token, x, equalNode);
         if (x == nullptr) {
-            x = make_shared<And>(token, x, equality());
+            x = make_shared<And>(token, x, equalNode);
         }
     }
     return x;
@@ -182,9 +186,11 @@ ExprNode Parser::equality()
     while (lookahead.tokenType == CodeTokenType::EQ || lookahead.tokenType == CodeTokenType::NE) {
         CodeToken token = lookahead;
         move();
-        x = foldConstant(token, x, rel());
+
+        auto relNode{ rel() };
+        x = foldConstant(token, x, relNode);
         if (x == nullptr) {
-            x = make_shared<Rel>(token, x, rel());
+            x = make_shared<Rel>(token, x, relNode);
         }
     }
     return x;
@@ -201,9 +207,11 @@ ExprNode Parser::rel()
         case CodeTokenType::GE:
             CodeToken token = lookahead;
             move();
-            x = foldConstant(token, x, expr());
+
+            auto exprNode{ expr() };
+            x = foldConstant(token, x, exprNode);
             if (x == nullptr) {
-                x = make_shared<Rel>(token, x, expr());
+                x = make_shared<Rel>(token, x, exprNode);
             }
     }
     return x;
@@ -216,9 +224,11 @@ shared_ptr<Expr> Parser::expr()
     while (lookahead.tokenType == CodeTokenType::Add || lookahead.tokenType == CodeTokenType::Sub) {
         CodeToken token = lookahead;
         move();
-        x = foldConstant(token, x, term());
+
+        auto termNode{ term() };
+        x = foldConstant(token, x, termNode);
         if (x == nullptr) {
-            x = make_shared<Arith>(token, x, term());
+            x = make_shared<Arith>(token, x, termNode);
         }
     }
     return x;
@@ -231,9 +241,11 @@ shared_ptr<Expr> Parser::term()
     while (lookahead.tokenType == CodeTokenType::Mul || lookahead.tokenType == CodeTokenType::Div) {
         CodeToken token = lookahead;
         move();
-        x = foldConstant(token, x, unary());
+
+        auto unaryNode{ unary() };
+        x = foldConstant(token, x, unaryNode);
         if (x == nullptr) {
-            x = make_shared<Arith>(token, x, unary());
+            x = make_shared<Arith>(token, x, unaryNode);
         }
     }
 
@@ -243,17 +255,46 @@ shared_ptr<Expr> Parser::term()
 shared_ptr<Expr> Parser::unary()
 // import a new procedure unary
 {
-    if (lookahead.tokenType == CodeTokenType::Sub) {
-        CodeToken token = lookahead;
-        move();
-        return make_shared<Unary>(token, unary());
-    } else if (lookahead.tokenType == CodeTokenType::Not) {
-        CodeToken token = lookahead;
-        move();
-        return make_shared<Not>(token, unary());
-    } else {
-        return factor();
+    switch (lookahead.tokenType) {
+        case CodeTokenType::Sub:
+        {
+            CodeToken token = lookahead;
+            move();
+
+            auto unaryNode{ unary() };
+            shared_ptr<Expr> x{ foldConstant(token, unaryNode) };
+            if (x == nullptr) {
+                x = make_shared<Unary>(token, unaryNode);
+            }
+            return x;
+        }
+        case CodeTokenType::Not:
+        {
+            CodeToken token = lookahead;
+            move();
+
+            auto unaryNode{ unary() };
+            shared_ptr<Expr> x{ foldConstant(token, unaryNode) };
+            if (x == nullptr) {
+                x = make_shared<Not>(token, unaryNode);
+            }
+            return x;
+        }
+        case CodeTokenType::Odd:
+        {
+            CodeToken token = lookahead;
+            move();
+
+            auto unaryNode{ unary() };
+            shared_ptr<Expr> x{ foldConstant(token, unaryNode) };
+            if (x == nullptr) {
+                x = make_shared<Odd>(token, unaryNode);
+            }
+            return x;
+        }
     }
+
+    return factor();
 }
 
 shared_ptr<Expr> Parser::factor()
@@ -316,19 +357,29 @@ shared_ptr<Constant> Parser::foldConstant(const CodeToken& opToken, ExprNode exp
     //    expr = constId;
     //}
 
-    if (unaryOp == CodeTokenType::Sub) {
-        return Constant::createInteger(-stoi(expr->token.value));
-    } else if (unaryOp == CodeTokenType::Not) {
-        if (expr->token.tokenType == CodeTokenType::True) {
-            return Constant::createBool(!true);
-        } else if (expr->token.tokenType == CodeTokenType::False) {
-            return Constant::createBool(!false);
-        } else {
-            return nullptr;
+    switch (unaryOp)
+    {
+        case CodeTokenType::Sub:
+        {
+            return Constant::createInteger(-stoi(expr->token.value));
         }
-    } else {
-        return nullptr;
+        case CodeTokenType::Not:
+        {
+            if (expr->token.tokenType == CodeTokenType::True) {
+                return Constant::createBool(!true);
+            } else if (expr->token.tokenType == CodeTokenType::False) {
+                return Constant::createBool(!false);
+            } else {
+                return nullptr;
+            }
+        }
+        case CodeTokenType::Odd: 
+        {
+            return Constant::createBool(stoi(expr->token.value) % 2 != 0);
+        }
     }
+
+    return nullptr;
 }
 
 shared_ptr<Constant> Parser::foldConstant(const CodeToken& opToken, ExprNode lhs, ExprNode rhs)

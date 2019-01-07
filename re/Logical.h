@@ -32,3 +32,9 @@ public:
     Rel(const CodeToken& token, ExprNode p1, ExprNode p2, bool constant = false);
     Rel(CodeToken&& token, ExprNode p1, ExprNode p2, bool constant = false);
 };
+
+class Odd : public Logical {
+public:
+    Odd(const CodeToken& token, ExprNode expr, bool constant = false);
+    Odd(CodeToken&& token, ExprNode expr, bool constant = false);
+};
