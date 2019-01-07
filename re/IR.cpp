@@ -1,6 +1,6 @@
 #include "IR.h"
 
-string toString(Opcode opcode)
+string opcodeToString(Opcode opcode)
 {
     switch (opcode) {
         case Opcode::Add:
@@ -32,5 +32,12 @@ string toString(Opcode opcode)
 
 string Quad::toString()
 {
-    return "";
+    switch (op) {
+        case Opcode::Add:
+        case Opcode::Sub:
+        case Opcode::Mul:
+        case Opcode::Div:
+            return dest.variable->toString() + '=' + 
+                src1.variable->toString() + opcodeToString(op) + src2.variable->toString();
+    }
 }

@@ -21,6 +21,8 @@ public:
         constant = cond;
     }
 
+    virtual string toString() override;
+
     Type type;
     CodeToken token;
 private:
@@ -49,3 +51,7 @@ public:
     shared_ptr<Constant> static createBool(bool b);
 };
 
+class Temp : public Expr {
+public:
+    Temp(int number, const Type& type, bool constant = false);
+};

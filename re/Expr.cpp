@@ -19,6 +19,11 @@ AstNode Expr::accept(AstVisitor & visitor)
     return visitor.visitExpr(static_pointer_cast<Expr>(shared_from_this()));
 }
 
+string Expr::toString()
+{
+    return token.value;
+}
+
 Id::Id(const CodeToken & token, const Type& type, int offset, bool constant)
     :Expr(token, type, constant), offset(offset)
 {
@@ -58,4 +63,9 @@ shared_ptr<Constant> Constant::createBool(bool b)
             );
     }
 
+}
+
+Temp::Temp(int number, const Type & type, bool constant)
+    :Expr({CodeTokenType::Id, "t" + to_string(number)}, type, constant)
+{
 }
