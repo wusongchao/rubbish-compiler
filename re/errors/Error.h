@@ -5,7 +5,7 @@
 using std::exception;
 using std::string;
 
-class CompileError : exception {
+class CompileError : public exception {
 public:
     CompileError(const string& message);
     CompileError(string&& message);
@@ -13,14 +13,14 @@ public:
     string info;
 };
 
-class SyntaxError : CompileError
+class SyntaxError : public CompileError
 {
 public:
     SyntaxError(const string& message);
     SyntaxError(string&& message);
 };
 
-class SemanticError : CompileError
+class SemanticError : public CompileError
 {
 public:
     SemanticError(const string& message);

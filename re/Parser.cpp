@@ -11,13 +11,8 @@ shared_ptr<Program> Parser::program()
     match(CodeTokenType::Program);
     match(CodeTokenType::Id);
     match(CodeTokenType::Semicolon);
-    try{
-        auto stmt{ block() };
-    }
-    catch (CompileError& error) {
-        throw;
-    }
     
+    auto stmt{ block() };
 
     return nullptr;
 }
@@ -92,7 +87,7 @@ void Parser::condecl()
             constTop->putSymbol(id, make_shared<Constant>(constant, Type::Int));
             break;
         default:
-            syntaxError("invalid constant declaration expression");
+            syntaxError("invalid constant declaration expression near line: " + to_string(id.rowIndex));
     }; 
 }
 

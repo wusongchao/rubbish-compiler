@@ -107,8 +107,13 @@ int main()
     scanner.addSkipToken(CodeTokenType::Comment);
     
     Parser parser(scanner);
-
-    auto p = parser.program();
+    try {
+        auto p = parser.program();
+    }
+    catch (const CompileError& error) {
+        std::cout << error.info << std::endl;
+    }
+   
 
     //while (!scanner.isFinish()) {
     //    CodeToken token = scanner.read();
