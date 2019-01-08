@@ -68,7 +68,7 @@
     <ClCompile Include="IR.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="IRGenerator.cpp">
+    <ClCompile Include="Stmt.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -136,5 +136,14 @@
     <ClInclude Include="IRGenerator.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Stmt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="re.rc" />
   </ItemGroup>
 </Project>

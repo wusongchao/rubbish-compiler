@@ -39,7 +39,4 @@ public:
 private:
 };
 
-class Stmt : public Ast {
-};
-
 
