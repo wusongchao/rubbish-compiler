@@ -201,12 +201,25 @@ shared_ptr<Stmt> Parser::stmt()
 			match(CodeTokenType::Call);
 			CodeToken token = lookahead;
 			match(CodeTokenType::Id);
-			auto id = top->getSymbol(token);
-			if (id == nullptr) {
+			auto func = funcTop->getSymbol(token);
+			if (func == nullptr || func->id==nullptr) {
 				semanticError("function undefined identifier: " + token.value + "in line:" + to_string(token.rowIndex));
 			}
-
-			///
+			auto exprs = std::vector< ExprNode >();
+			do
+			{
+				auto exp = expr();
+				exprs.push_back(exp);
+				token = lookahead;
+				move();
+			} while (token.tokenType == CodeTokenType::CloseParenthesis);
+			if (token.tokenType != CodeTokenType::CloseParenthesis) {
+				syntaxError(string("miss ')' in  line: ") + to_string(lookahead.rowIndex));
+			}
+			if (exprs.size() != func->paramType.size()) {
+				syntaxError(string("No find overload function") + to_string(lookahead.rowIndex));
+			}
+			return make_shared<Call>(func->id, exprs);
 		}
             break;
         case CodeTokenType::Begin:
@@ -237,7 +250,6 @@ shared_ptr<Stmt> Parser::stmt()
 			if(token.tokenType!=CodeTokenType::CloseParenthesis)
 				SyntaxError(string("miss ')' in  line: ") + to_string(lookahead.rowIndex));
 			return make_shared<Read>(ids);
-
 		}
             break;
         case CodeTokenType::Write:

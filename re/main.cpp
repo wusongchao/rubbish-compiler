@@ -155,5 +155,6 @@ int main()
     cin.get();
 
 	*/
+	infile.close();
     return 0;
 }
