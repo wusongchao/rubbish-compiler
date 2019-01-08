@@ -10,6 +10,7 @@
 using std::unique_ptr;
 using std::shared_ptr;
 
+
 class Parser {
 public:
     shared_ptr<Program> program();
@@ -79,6 +80,6 @@ private:
     CodeToken lookahead;
     shared_ptr<Env> top{ nullptr };
     shared_ptr<ConstEnv> constTop{ nullptr };
-	shared_ptr<FuncEnv> funcTop;
+	shared_ptr<FuncEnv> funcTop = std::make_shared<FuncEnv>();
     int usedOffset = 0;
 };

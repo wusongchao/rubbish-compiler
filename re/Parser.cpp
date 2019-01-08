@@ -16,9 +16,7 @@ shared_ptr<Program> Parser::program()
     match(CodeTokenType::Program);
     match(CodeTokenType::Id);
     match(CodeTokenType::Semicolon);
-	block();
-
-    return nullptr;
+    return make_shared<Program>(block());
 }
 
 Parser::Parser(Scanner & scanner)
@@ -67,8 +65,11 @@ AstNode Parser::proc()
 	while (lookahead.tokenType==CodeTokenType::Id)
 	{
 		afunc->paramType.push_back(Type::Int);
-		move();
+		if (lookahead.tokenType == CodeTokenType::Comma) {
+			match(CodeTokenType::Comma);
+		}
 	}
+	match(CodeTokenType::CloseParenthesis);
 	funcTop->putSymbol(token.value,afunc);
 	match(CodeTokenType::Semicolon);
 	auto b = block();
