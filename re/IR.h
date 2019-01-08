@@ -13,6 +13,12 @@ enum class Opcode {
     Sub,
     Mul,
     Div,
+    LT,
+    LE,
+    GT,
+    GE,
+    EQ,
+    NE,
 
     // Unary operator
     Neg,
@@ -21,9 +27,15 @@ enum class Opcode {
 
     Load,     // similar to read
     Store,     // similar to write
+    Jlt,
+    Jle,
+    Jgt,
+    Jge,
+    Jeq,
+    Jne,
     Jt,    // jump if true 
     Jf,    // jump if false
-    Goto,
+    Jmp,
     Param,
     Call,
     Label
@@ -94,9 +106,11 @@ struct Quad {
     Quad(Opcode opcode, VarNode src, VarNode dest);
     Quad(Opcode opcode, VarNode src1, VarNode src2, VarNode dest);
 
+    shared_ptr<Quad> next;
     // (op, src1, src2, dest)
     string toString() const;
 };
 
+using QuadPtr = shared_ptr<Quad>;
 
 }

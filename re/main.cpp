@@ -120,6 +120,7 @@ int main()
         "const i := 1\n"
         "var a, b\n"
         "begin\n"
+        "if a = 2 then\n"
         "a := 1 + 2 + b;\n"
         "b := a + 3 - (5 * a) * 5"
         "end"
@@ -141,8 +142,10 @@ int main()
         IRGenerator generator;
         generator.visit(p);
 
-        for (const auto& quad : generator.getQuads()) {
-            std::cout << quad.toString() << std::endl;
+        auto quad = generator.getQuads()[0];
+        while (quad != nullptr) {
+            std::cout << quad->toString() << std::endl;
+            quad = quad->next;
         }
     }
     catch (const CompileError& error) {

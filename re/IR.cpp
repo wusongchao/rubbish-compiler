@@ -84,6 +84,18 @@ string opcodeToString(Opcode opcode)
             return "*";
         case Opcode::Div:
             return "/";
+        case Opcode::LT:
+            return "<";
+        case Opcode::LE:
+            return "<=";
+        case Opcode::GT:
+            return ">";
+        case Opcode::GE:
+            return ">=";
+        case Opcode::EQ:
+            return "==";
+        case Opcode::NE:
+            return "!=";
         case Opcode::Not:
             return "!";
         case Opcode::Assign:
@@ -92,12 +104,24 @@ string opcodeToString(Opcode opcode)
             return "";
         case Opcode::Store:
             return "";
+        case Opcode::Jlt:
+            return "j<";
+        case Opcode::Jle:
+            return "j<=";
+        case Opcode::Jgt:
+            return "j>";
+        case Opcode::Jge:
+            return "j>=";
+        case Opcode::Jeq:
+            return "j==";
+        case Opcode::Jne:
+            return "j!=";
         case Opcode::Jt:
-            return "";
+            return "jtrue";
         case Opcode::Jf:
-            return "";
-        case Opcode::Goto:
-            return "goto";
+            return "jfalse";
+        case Opcode::Jmp:
+            return "jmp";
         case Opcode::Param:
             return "param";
         case Opcode::Call:

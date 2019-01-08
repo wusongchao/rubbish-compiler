@@ -1,12 +1,13 @@
 #include "Logical.h"
+#include "AstVisitor.h"
 
 Logical::Logical(const CodeToken & token, ExprNode p1, ExprNode p2, bool constant)
-    :Expr(token, Type::Bool, constant)
+    :Expr(token, Type::Bool, constant), expr1(p1), expr2(p2)
 {
 }
 
 Logical::Logical(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
-    : Expr(std::move(token), Type::Bool, constant)
+    : Expr(std::move(token), Type::Bool, constant), expr1(p1), expr2(p2)
 {
 }
 
@@ -41,13 +42,18 @@ Not::Not(CodeToken && token, ExprNode expr, bool constant)
 }
 
 Rel::Rel(const CodeToken & token, ExprNode p1, ExprNode p2, bool constant)
-    : Logical(token, p1, p1, constant)
+    : Logical(token, p1, p2, constant)
 {
 }
 
 Rel::Rel(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
-    : Logical(std::move(token), p1, p1, constant)
+    : Logical(std::move(token), p1, p2, constant)
 {
+}
+
+AstNode Rel::accept(AstVisitor & visitor)
+{
+    return visitor.visitRel(static_pointer_cast<Rel>(shared_from_this()));
 }
 
 Odd::Odd(const CodeToken & token, ExprNode expr, bool constant)
