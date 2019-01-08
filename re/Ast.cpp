@@ -9,7 +9,12 @@ AstNode Program::accept(AstVisitor & visitor)
 }
 
 Program::Program(BodyNode body)
-    :body(body)
+	:body(body)
+{
+}
+
+Program::Program(BodyNode body, ProcNode proc)
+	:body(body),proc(proc)
 {
 }
 

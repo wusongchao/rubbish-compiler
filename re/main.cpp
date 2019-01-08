@@ -83,29 +83,31 @@ void defineTokens(Lexicon& lexicon)
     );
 }
 
+void test1() {
+	Lexicon lexicon;
+	defineTokens(lexicon);
 
-int main()
-{
+	std::ifstream infile("Stmt.txt");
+	if (!infile.is_open())
+	{
+		cout << "can`t open file testStmt.txt" << endl;
+	}
+	istream& stream = infile;
 
+	Scanner scanner(stream, lexicon.createScannerInfo());
+	scanner.addSkipToken(CodeTokenType::WhiteSpace);
+	scanner.addSkipToken(CodeTokenType::LineBreaker);
+	scanner.addSkipToken(CodeTokenType::Comment);
 
-	//Lexicon lexicon;
-	//std::ifstream infile("Stmt.txt");
-	//if (!infile.is_open())
-	//{
-	//	cout << "can`t open file testStmt.txt" << endl;
-	//}
-	//istream& stream = infile;
-	//Scanner scanner(stream, lexicon.createScannerInfo());
-	//scanner.addSkipToken(CodeTokenType::WhiteSpace);
-	//scanner.addSkipToken(CodeTokenType::LineBreaker);
-	//scanner.addSkipToken(CodeTokenType::Comment);
+	Parser parser(scanner);
+	parser.program();
+	infile.close();
+}
 
-	//Parser parser(scanner);
-	//parser.program();
-	
-    Lexicon lexicon;
+void test2() {
+	Lexicon lexicon;
 
-    defineTokens(lexicon);
+	defineTokens(lexicon);
 
     //istringstream stringStream(
     //    "program fuck;"
@@ -131,39 +133,35 @@ int main()
     //    "4\n"
     //);
 
-    istream& stream = stringStream;
+	istream& stream = stringStream;
 
-    Scanner scanner(stream, lexicon.createScannerInfo());
-    scanner.addSkipToken(CodeTokenType::WhiteSpace);
-    scanner.addSkipToken(CodeTokenType::LineBreaker);
-    scanner.addSkipToken(CodeTokenType::Comment);
-    
-    Parser parser(scanner);
-    try {
-        auto p = parser.program();
-        IRGenerator generator;
-        generator.visit(p);
+	Scanner scanner(stream, lexicon.createScannerInfo());
+	scanner.addSkipToken(CodeTokenType::WhiteSpace);
+	scanner.addSkipToken(CodeTokenType::LineBreaker);
+	scanner.addSkipToken(CodeTokenType::Comment);
 
-        auto quad = generator.getQuads()[0];
-        while (quad != nullptr) {
-            std::cout << quad->toString() << std::endl;
-            quad = quad->next;
-        }
-    }
-    catch (const CompileError& error) {
-        std::cout << error.info << std::endl;
-    }
-   
 
-    //while (!scanner.isFinish()) {
-    //    CodeToken token = scanner.read();
-    //    cout << (int)token.tokenType << ' ' << token.value << ' ' << token.rowIndex << endl;
-    //}
+	Parser parser(scanner);
+	try {
+		auto p = parser.program();
+		IRGenerator generator;
+		generator.visit(p);
 
-    //token = scanner.read();
-    //cout << (int)token.tokenType << endl;
-    cin.get();
+		auto quad = generator.getQuads()[0];
+		while (quad != nullptr) {
+			std::cout << quad->toString() << std::endl;
+			quad = quad->next;
+		}
+	}
+	catch (const CompileError& error) {
+		std::cout << error.info << std::endl;
+	}
+	cin.get();
+}
 
-	
+int main()
+{
+	test1();
+	//test2();
     return 0;
 }

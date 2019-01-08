@@ -19,9 +19,9 @@ public:
 
     shared_ptr<Id> getSymbol(const CodeToken& token) {
         Env* cur = this;
-        auto endIter = table.end();
         while (cur != nullptr) {
-            auto it = table.find(token.value);
+			auto endIter = cur->table.end();
+            auto it = cur->table.find(token.value);
             if (it != endIter) {
                 return it->second;
             }
@@ -51,9 +51,9 @@ public:
 
     shared_ptr<Constant> getSymbol(const CodeToken& token) {
         ConstEnv* cur = this;
-        auto endIter = table.end();
         while (cur != nullptr) {
-            auto it = table.find(token.value);
+			auto endIter = cur->table.end();
+            auto it = cur->table.find(token.value);
             if (it != endIter) {
                 return it->second;
             }
@@ -66,4 +66,37 @@ private:
     shared_ptr<ConstEnv> prev{ nullptr };
 
     unordered_map<string, shared_ptr<Constant>> table;
+};
+
+class FuncScripter {
+public:
+	FuncScripter(){
+		id = nullptr;
+		paramType = std::vector<Type>();
+	};
+	shared_ptr<Id> id;
+	std::vector<Type> paramType;
+};
+
+class FuncEnv{
+public:
+	FuncEnv() {
+		table = unordered_map<string, shared_ptr<FuncScripter>>();
+	};
+	void putSymbol(const CodeToken& token, shared_ptr<FuncScripter> funcscrip) {
+		table.insert({ token.value, funcscrip });
+	}
+	void putSymbol(const string& name, shared_ptr<FuncScripter> funcscrip) {
+		table.insert({ name, funcscrip });
+	}
+	shared_ptr<FuncScripter> getSymbol(const CodeToken& token) {
+		auto endIter = table.end();
+		auto it = table.find(token.value);
+		if (it != endIter) {
+			return it->second;
+		}
+		return nullptr;
+	}
+private:
+	unordered_map<string, shared_ptr<FuncScripter>> table;
 };
