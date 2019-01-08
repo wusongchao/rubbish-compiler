@@ -120,7 +120,8 @@ int main()
         "const i := 1\n"
         "var a, b\n"
         "begin\n"
-        "a := 1 + 2 + b\n"
+        "a := 1 + 2 + b;\n"
+        "b := a + 3 - (5 * a) * 5"
         "end"
     );
     //istringstream stringStream(

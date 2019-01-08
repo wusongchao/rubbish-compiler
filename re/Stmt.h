@@ -26,37 +26,39 @@ public:
 
 class If : public Stmt {
 public:
-	If(shared_ptr<Expr> l, StmtNode s1_, StmtNode s2_);
-	If(shared_ptr<Expr> l, StmtNode s1_);
-	shared_ptr<Expr> lexp;
-	StmtNode s1;
-	StmtNode s2;
+	If(ExprNode l, StmtNode s1_, StmtNode s2_);
+	If(ExprNode l, StmtNode s1_);
+    ExprNode cond;
+	StmtNode trueStmt;
+	StmtNode falseStmt;
 };
 
 class While : public Stmt {
 public:
-	While(shared_ptr<Expr>, StmtNode s1);
-	shared_ptr<Expr> lexp;
-	StmtNode s;
+	While(ExprNode, StmtNode s1);
+    ExprNode cond;
+	StmtNode stmt;
 };
 
 class Call : public Stmt {
 public:
-	Call(shared_ptr<Id> id_, std::vector<ExprNode> param_);
-	shared_ptr<Id> id;
-	std::vector<ExprNode> param;
+	Call(IdNode id_, const vector<ExprNode>& param_);
+	IdNode id;
+	vector<ExprNode> param;
 };
 
 class Read : public Stmt {
 public:
-	Read(std::vector< shared_ptr<Id> > data);
-	std::vector< shared_ptr<Id> > datas;
+	Read(const vector<IdNode>& data);
+    Read(vector<IdNode>&& data);
+	vector<IdNode> datas;
 };
 
 class Write : public Stmt {
 public:
-	Write(std::vector< ExprNode > data);
-	std::vector< ExprNode > datas;
+	Write(const vector<ExprNode>& data);
+    Write(vector<ExprNode>&& data);
+	vector<ExprNode> datas;
 };
 
 class Body : public Stmt{
@@ -83,4 +85,14 @@ private:
 using ProgramNode = shared_ptr<Program>;
 
 using AssignNode = shared_ptr<Assign>;
+
+using IfNode = shared_ptr<If>;
+
+using WhileNode = shared_ptr<While>;
+
+using CallNode = shared_ptr<Call>;
+
+using ReadNode = shared_ptr<Read>;
+
+using writeNode = shared_ptr<Write>;
 

@@ -137,8 +137,11 @@ shared_ptr<Stmt> Parser::stmt()
 			match(CodeTokenType::Id);
 			shared_ptr<Id> id = top->getSymbol(token);
 			if (id == nullptr) {
-				semanticError("reference to undefined identifier: " + token.value + "in line:" + to_string(token.rowIndex));
+				semanticError("reference to undefined identifier: " + token.value + "in line: " + to_string(token.rowIndex));
 			}
+            if (id->isConstant()) {
+                semanticError("attempt to re-assign identifier " + token.value + " qualified by const in line: " + to_string(token.rowIndex));
+            }
             match(CodeTokenType::Assign);
 			ExprNode exp = expr();
 			return make_shared<Assign>(id, exp);

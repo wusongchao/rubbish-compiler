@@ -21,20 +21,19 @@ Stmt::~Stmt()
 {
 }
 
-While::While(shared_ptr<Expr> l_, StmtNode s_)
-	:lexp(l_), s(s_)
+While::While(ExprNode l_, StmtNode s_)
+	:cond(l_), stmt(s_)
 {
 }
 
-If::If(shared_ptr<Expr> l, StmtNode s1_, StmtNode s2_)
-	: lexp(l), s1(s1_), s2(s2_)
+If::If(ExprNode l, StmtNode s1_, StmtNode s2_)
+	: cond(l), trueStmt(s1_), falseStmt(s2_)
 {
 }
 
-If::If(shared_ptr<Expr> l, StmtNode s1_)
-	: lexp(l), s1(s1)
+If::If(ExprNode l, StmtNode s1_)
+	: cond(l), trueStmt(s1_), falseStmt(nullptr)
 {
-	s2 = nullptr;
 }
 
 Assign::Assign(shared_ptr<Id> id_, ExprNode expr_)
@@ -42,18 +41,28 @@ Assign::Assign(shared_ptr<Id> id_, ExprNode expr_)
 {
 }
 
-Call::Call(shared_ptr<Id> id_, std::vector<ExprNode> param_)
+Call::Call(IdNode id_, const vector<ExprNode>& param_)
 	: id(id_), param(param_)
 {
 }
 
-Read::Read(std::vector<shared_ptr<Id>> data)
+Read::Read(const vector<IdNode>& data)
 	: datas(data)
 {
 }
 
-Write::Write(std::vector< ExprNode > data)
+Read::Read(vector<IdNode>&& data)
+    :datas(std::move(data))
+{
+}
+
+Write::Write(const vector< ExprNode >& data)
 	: datas(data)
+{
+}
+
+Write::Write(vector<ExprNode>&& data)
+    :datas(std::move(data))
 {
 }
 
