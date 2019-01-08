@@ -1,18 +1,18 @@
-﻿program main;
+program main;
 const
-    a = 10;
+  a := 10
 var
-    b,c;
-    procedure p;
-    begin
-        c := b + a
-    end;
+  b,c
+procedure p();
 begin
-    read(b,b,b,b);
-    while b < 0 do
-    begin
-        call p;
-        write(2 * c,b,b,b);
-        read(b)
-    end
+  c := b + a;
+end
+begin
+  read(b,b,b,b);
+  while b < 0 do
+  begin
+    call p;
+    write(2 * c,b,b,b);
+    read(b);
+  end
 end
