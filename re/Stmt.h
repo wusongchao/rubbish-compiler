@@ -30,6 +30,8 @@ class If : public Stmt {
 public:
 	If(ExprNode l, StmtNode s1_, StmtNode s2_);
 	If(ExprNode l, StmtNode s1_);
+
+    AstNode accept(AstVisitor& visitor) override;
     ExprNode cond;
 	StmtNode trueStmt;
 	StmtNode falseStmt;
@@ -38,6 +40,9 @@ public:
 class While : public Stmt {
 public:
 	While(ExprNode, StmtNode s1);
+
+    AstNode accept(AstVisitor& visitor) override;
+
     ExprNode cond;
 	StmtNode stmt;
 };
@@ -45,6 +50,9 @@ public:
 class Call : public Stmt {
 public:
 	Call(IdNode id_, const vector<ExprNode>& param_);
+    
+    AstNode accept(AstVisitor& visitor) override;
+
 	IdNode id;
 	vector<ExprNode> param;
 };
@@ -53,6 +61,9 @@ class Read : public Stmt {
 public:
 	Read(const vector<IdNode>& data);
     Read(vector<IdNode>&& data);
+
+    AstNode accept(AstVisitor& visitor) override;
+
 	vector<IdNode> datas;
 };
 
@@ -60,6 +71,9 @@ class Write : public Stmt {
 public:
 	Write(const vector<ExprNode>& data);
     Write(vector<ExprNode>&& data);
+
+    AstNode accept(AstVisitor& visitor) override;
+
 	vector<ExprNode> datas;
 };
 
@@ -113,4 +127,5 @@ using CallNode = shared_ptr<Call>;
 
 using ReadNode = shared_ptr<Read>;
 
-using writeNode = shared_ptr<Write>;
+using WriteNode = shared_ptr<Write>;
+

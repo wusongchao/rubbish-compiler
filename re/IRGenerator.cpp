@@ -55,6 +55,109 @@ AstNode IRGenerator::visitExpr(ExprNode expr)
     return visit(expr);
 }
 
+AstNode IRGenerator::visitIf(IfNode ifNode)
+{
+    //int ifLabel = emitLabel();
+    // logical expression
+    if (ifNode->falseStmt != nullptr) {
+        int elseLabel = emitLabel();
+        int endLabel = emitLabel();
+
+        visit(ifNode->cond);
+        auto cond{ logicalStack.top() };
+        logicalStack.pop();
+
+        emitConditionJmp(getOppositeConditonJmp(cond->op), cond->src1, cond->src2, elseLabel);
+
+        visit(ifNode->trueStmt);
+
+        emitJmp(endLabel);
+
+        markLabel(elseLabel);
+        visit(ifNode->falseStmt);
+        markLabel(endLabel);
+    } else {
+        int endLabel = emitLabel();
+
+        visit(ifNode->cond);
+        auto cond{ logicalStack.top() };
+        logicalStack.pop();
+
+        emitConditionJmp(getOppositeConditonJmp(cond->op), cond->src1, cond->src2, endLabel);
+
+        visit(ifNode->trueStmt);
+
+        markLabel(endLabel);
+    }
+    
+    return ifNode;
+}
+
+AstNode IRGenerator::visitWhile(WhileNode whileNode)
+{
+    return AstNode();
+}
+
+AstNode IRGenerator::visitCall(CallNode call)
+{
+    for (const auto& param : call->param) {
+        visit(param);
+
+        // get the argument by visit expressions(do the evaluation)
+        auto arg{ operateStack.top() };
+        operateStack.pop();
+        emitParam(arg);
+    }
+
+    auto func{ make_shared<IR::Id>(call->id) };
+    emitCall(func);
+    return call;
+}
+
+AstNode IRGenerator::visitRead(ReadNode read)
+{
+    return AstNode();
+}
+
+AstNode IRGenerator::visitWrite(WriteNode write)
+{
+    return AstNode();
+}
+
+AstNode IRGenerator::visitRel(RelNode rel)
+{
+    visit(rel->expr1);
+    visit(rel->expr2);
+
+    auto src1{ operateStack.top() };
+    operateStack.pop();
+    auto src2{ operateStack.top() };
+    operateStack.pop();
+
+    switch (rel->token.tokenType) {
+        case CodeTokenType::LT:
+            emitLogical(Opcode::LT, src1, src2);
+            break;
+        case CodeTokenType::LE:
+            emitLogical(Opcode::LE, src1, src2);
+            break;
+        case CodeTokenType::GT:
+            emitLogical(Opcode::GT, src1, src2);
+            break;
+        case CodeTokenType::GE:
+            emitLogical(Opcode::GE, src1, src2);
+            break;
+        case CodeTokenType::EQ:
+            emitLogical(Opcode::EQ, src1, src2);
+            break;
+        case CodeTokenType::NE:
+            emitLogical(Opcode::NE, src1, src2);
+            break;
+    }
+    // will not create temp variable
+    return rel;
+}
+
 AstNode IRGenerator::visitArith(ArithNode arith)
 {
     visit(arith->expr1);

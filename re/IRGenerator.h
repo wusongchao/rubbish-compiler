@@ -10,6 +10,7 @@ using std::make_shared;
 using std::stack;
 
 using IR::Quad;
+using IR::QuadPtr;
 using IR::Var;
 using IR::VarNode;
 using IR::Opcode;
@@ -17,12 +18,12 @@ using IR::Opcode;
 class IRGenerator : public AstVisitor{
 public:
 
-    const vector<Quad>& getQuads() const
+    const vector<QuadPtr>& getQuads() const
     {
         return quads;
     }
 
-    const vector<int> getLabels() const
+    const vector<QuadPtr> getLabels() const
     {
         return labels;
     }
@@ -35,6 +36,18 @@ public:
 
     AstNode visitExpr(ExprNode expr) override;
 
+    AstNode visitIf(IfNode ifNode) override;
+
+    AstNode visitWhile(WhileNode whileNode) override;
+
+    AstNode visitCall(CallNode call) override;
+
+    AstNode visitRead(ReadNode read) override;
+
+    AstNode visitWrite(WriteNode write) override;
+
+    AstNode visitRel(RelNode rel) override;
+
     AstNode visitArith(ArithNode arith) override;
 
     AstNode visitOp(OpNode op) override;
@@ -45,12 +58,7 @@ public:
 
     AstNode visitId(IdNode id) override;
 
-
 private:
-    void emitGoto(int label) {
-        //quads.emplace_back();
-    }
-
     //TempNode emitBinary(const CodeToken& opToken, const Type& resType, const ExprNode& lhs, const ExprNode& rhs);
 
     shared_ptr<IR::Temp> createTemp(const Type& type) {
@@ -61,38 +69,114 @@ private:
         return make_shared<IR::Temp>(tempIndex++, width);
     }
 
-    void emitConditionJmp() {
+    void appendQuad(QuadPtr quad) {
+        auto quadsSize = quads.size();
+        if (quadsSize != 0) {
+            quads[quadsSize - 1]->next = quad;
+        }
+        quads.push_back(quad);
+    }
 
+    void emitConditionJmp(Opcode op, VarNode src1, VarNode src2, VarNode dest) {
+        appendQuad(make_shared<Quad>(op, src1, src2, dest));
+        //quads.emplace_back(op, src1, src2, dest);
+    }
+
+    void emitConditionJmp(Opcode op, VarNode src1, VarNode src2, int dest) {
+        auto destLabel{ make_shared<IR::Integer>(dest) };
+        emitConditionJmp(op, src1, src2, destLabel);
+    }
+
+    void emitJmp(VarNode dest) {
+        auto jmp{ make_shared<Quad>(Opcode::Jmp) };
+        jmp->result = dest;
+        appendQuad(jmp);
+        //quads.push_back(jmp);
+    }
+
+    void emitJmp(int label) {
+        auto dest{ make_shared<IR::Integer>(label) };
+        emitJmp(dest);
     }
 
     void emitArith(Opcode op, VarNode src1, VarNode src2, VarNode dest) {
-        quads.emplace_back(op, src1, src2, dest);
+        appendQuad(make_shared<Quad>(op, src1, src2, dest));
+        //quads.emplace_back(op, src1, src2, dest);
+    }
+
+    // will not push logical ir to quads
+    void emitLogical(Opcode op, VarNode src1, VarNode src2) {
+        auto logical{ make_shared<Quad>(Opcode::Jmp) };
+        logical->src1 = src1;
+        logical->src2 = src2;
+        logicalStack.push(logical);
     }
 
     void emitUnary(Opcode op, VarNode src, VarNode dest) {
-        quads.emplace_back(op, src, dest);
+        appendQuad(make_shared<Quad>(op, src, dest));
     }
 
     void emitAssign(VarNode src, VarNode dest) {
-        quads.emplace_back(Opcode::Assign, src, dest);
+        appendQuad(make_shared<Quad>(Opcode::Assign, src, dest));
     }
 
-    int defineLabel() {
-        labels.push_back(0);
-
-        // L0 is a special label
-        // label starts from L1
-        return labels.size();
+    void emitParam(VarNode param) {
+        appendQuad(make_shared<Quad>(Opcode::Param, param));
     }
 
+    void emitCall(VarNode funcName) {
+        auto call{ make_shared<Quad>(Opcode::Call) };
+        call->result = funcName;
+        appendQuad(call);
+    }
+
+    int emitLabel() {
+        int number = labels.size();
+        auto label{ make_shared<Quad>(Opcode::Label, make_shared<IR::Integer>(number)) };
+        labels.push_back(label);
+        // for label quad, the src1 is the label number, result is the target number
+        //quads.emplace_back(Opcode::Label, make_shared<IR::Integer>(number));
+        //appendQuad(label);
+        return number;
+    }
+
+    // markLabel: the label jump to where
     void markLabel(int label) {
-        labels[label] = quads.size();
+        // for label quad, the src1 is the label number, result is the target number
+        labels[label]->result = make_shared<IR::Integer>(quads.size() + 1);
+        appendQuad(labels[label]);
+        // skip one quad: the label quad
+    }
+
+    Opcode getOppositeConditonJmp(Opcode op) {
+        switch (op)
+        {
+            case Opcode::LT:
+                return Opcode::Jge;
+            case Opcode::LE:
+                return Opcode::Jgt;
+            case Opcode::GT:
+                return Opcode::Jle;
+            case Opcode::GE:
+                return Opcode::Jlt;
+            case Opcode::EQ:
+                return Opcode::Jne;
+            case Opcode::NE:
+                return Opcode::Jeq;
+        }
+        return Opcode::Jmp;
     }
 
     int tempIndex = 1;
-    vector<Quad> quads;
-    vector<int> labels;
-    stack<shared_ptr<Var>> operateStack;
+    vector<QuadPtr> quads;
+    vector<QuadPtr> labels;
+    stack<VarNode> operateStack;
+    // see the comment in visitRel, visitIf
+    stack<QuadPtr> logicalStack;
+    // if a then b
+    // 0: if not a jmp L0
+    // 1: b
+    // L0: 2:
     // label number -> offset address
     // L1:L3:
     //   i = i + 1

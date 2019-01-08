@@ -31,6 +31,8 @@ class Rel : public Logical {
 public:
     Rel(const CodeToken& token, ExprNode p1, ExprNode p2, bool constant = false);
     Rel(CodeToken&& token, ExprNode p1, ExprNode p2, bool constant = false);
+
+    AstNode accept(AstVisitor& visitor) override;
 };
 
 class Odd : public Logical {
@@ -38,3 +40,10 @@ public:
     Odd(const CodeToken& token, ExprNode expr, bool constant = false);
     Odd(CodeToken&& token, ExprNode expr, bool constant = false);
 };
+
+using LogicalNode = shared_ptr<Logical>;
+using OrNode = shared_ptr<Or>;
+using AndNode = shared_ptr<And>;
+using NotNode = shared_ptr<Not>;
+using RelNode = shared_ptr<Rel>;
+using OddNode = shared_ptr<Odd>;
