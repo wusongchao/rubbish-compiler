@@ -27,7 +27,7 @@ Parser::Parser(Scanner & scanner)
     move();
 }
 
-shared_ptr<Stmt> Parser::block()
+AstNode Parser::block()
 // <block> ¡ú [<condecl>][<vardecl>][<proc>]<body>
 {
     // now current pointer is managed by both savedEnv and top
@@ -41,18 +41,43 @@ shared_ptr<Stmt> Parser::block()
     auto savedConstEnv{ constTop };
     constTop = make_shared<ConstEnv>(constTop);
 
-
     condecls();
     vardecls();
 	
     top = savedEnv;
     constTop = savedConstEnv;
-
-	body();
-
-
-    return nullptr;
+	AstNode p = nullptr;
+	if (lookahead.tokenType == CodeTokenType::Procedure) {
+		auto p = proc();
+	}
+	auto b = body();
+    return make_shared<Block>(p,b);
     //return shared_ptr<Stmt>();
+}
+
+AstNode Parser::proc()
+{
+	//<proc> ¡ú procedure <id>£¨[<id>{,<id>}]£©;<block>{;<proc>}
+	match(CodeTokenType::Procedure);
+	CodeToken token = lookahead;
+	match(CodeTokenType::Id);
+	auto afunc = make_shared<FuncScripter>();
+	afunc->id = make_shared<Id>(token, Type::Func, 0);
+	match(CodeTokenType::OpenParenthesis);
+	while (lookahead.tokenType==CodeTokenType::Id)
+	{
+		afunc->paramType.push_back(Type::Int);
+		move();
+	}
+	funcTop->putSymbol(token.value,afunc);
+	match(CodeTokenType::Semicolon);
+	auto b = block();
+	auto procs = std::vector<AstNode>();
+	while(lookahead.tokenType == CodeTokenType::Semicolon) {
+		match(CodeTokenType::Semicolon);
+		procs.push_back(proc());
+	}
+	return make_shared<Proc>(afunc->id,b,procs);
 }
 
 void Parser::condecls()

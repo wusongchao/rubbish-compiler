@@ -67,3 +67,31 @@ private:
 
     unordered_map<string, shared_ptr<Constant>> table;
 };
+
+class FuncScripter {
+public:
+	shared_ptr<Id> id;
+	std::vector<Type> paramType;
+};
+
+class FuncEnv{
+public:
+	void putSymbol(const CodeToken& token, shared_ptr<FuncScripter> funcscrip) {
+		table.insert({ token.value, funcscrip });
+	}
+
+	void putSymbol(const string& name, shared_ptr<FuncScripter> funcscrip) {
+		table.insert({ name, funcscrip });
+	}
+	shared_ptr<FuncScripter> getSymbol(const CodeToken& token) {
+		FuncEnv* cur = this;
+		auto endIter = table.end();
+		auto it = table.find(token.value);
+		if (it != endIter) {
+			return it->second;
+		}
+		return nullptr;
+	}
+private:
+	unordered_map<string, shared_ptr<FuncScripter>> table;
+};

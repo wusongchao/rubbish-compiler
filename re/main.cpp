@@ -85,8 +85,6 @@ void defineTokens(Lexicon& lexicon)
 
 int main()
 {
-
-
 	Lexicon lexicon;
 	std::ifstream infile("Stmt.txt");
 	if (!infile.is_open())
@@ -94,6 +92,14 @@ int main()
 		cout << "can`t open file testStmt.txt" << endl;
 	}
 	istream& stream = infile;
+	/*
+	istringstream stringstream(
+		"4+5+1+(3-5)*2*(1)\n"
+	);
+	istream& stream = stringStream;
+	*/
+
+	defineTokens(lexicon);
 	Scanner scanner(stream, lexicon.createScannerInfo());
 	scanner.addSkipToken(CodeTokenType::WhiteSpace);
 	scanner.addSkipToken(CodeTokenType::LineBreaker);

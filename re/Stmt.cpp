@@ -44,7 +44,7 @@ Assign::Assign(shared_ptr<Id> id_, ExprNode expr_)
 }
 
 Call::Call(shared_ptr<Id> id_, std::vector<ExprNode> param_)
-	: id(id_), param(param_)
+	: id(id_), params(param_)
 {
 }
 

@@ -44,7 +44,7 @@ class Call : public Stmt {
 public:
 	Call(shared_ptr<Id> id_, std::vector<ExprNode> param_);
 	shared_ptr<Id> id;
-	std::vector<ExprNode> param;
+	std::vector<ExprNode> params;
 };
 
 class Read : public Stmt {

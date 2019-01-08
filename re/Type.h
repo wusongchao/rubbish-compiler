@@ -1,7 +1,7 @@
 #pragma once
 
 enum class TypeTag {
-    Int, Bool, Null
+    Int, Bool, Null,Func
 };
 
 struct Type {
@@ -13,4 +13,5 @@ struct Type {
     const static Type Int;
     const static Type Bool;
     const static Type Null;
+	const static Type Func;
 };

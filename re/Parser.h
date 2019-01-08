@@ -6,6 +6,7 @@
 #include "Env.h"
 #include "errors\Error.h"
 #include "Stmt.h"
+
 using std::unique_ptr;
 using std::shared_ptr;
 
@@ -15,7 +16,9 @@ public:
 
     Parser(Scanner& scanner);
 private:
-    shared_ptr<Stmt> block();
+    shared_ptr<Ast> block();
+
+	AstNode proc();
 
     void condecls();
 
@@ -76,6 +79,6 @@ private:
     CodeToken lookahead;
     shared_ptr<Env> top{ nullptr };
     shared_ptr<ConstEnv> constTop{ nullptr };
-
+	shared_ptr<FuncEnv> funcTop;
     int usedOffset = 0;
 };
