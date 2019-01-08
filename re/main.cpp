@@ -5,6 +5,7 @@
 #include "NFAConvertHelper.h"
 #include "Scanner.h"
 #include "Parser.h"
+#include "IRGenerator.h"
 #include <fstream>
 
 using std::cin;
@@ -119,7 +120,7 @@ int main()
         "const i := 1\n"
         "var a, b\n"
         "begin\n"
-        "a := 1 + 2 + i\n"
+        "a := 1 + 2 + b\n"
         "end"
     );
     //istringstream stringStream(
@@ -136,6 +137,12 @@ int main()
     Parser parser(scanner);
     try {
         auto p = parser.program();
+        IRGenerator generator;
+        generator.visit(p);
+
+        for (const auto& quad : generator.getQuads()) {
+            std::cout << quad.toString() << std::endl;
+        }
     }
     catch (const CompileError& error) {
         std::cout << error.info << std::endl;

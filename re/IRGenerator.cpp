@@ -27,12 +27,27 @@ AstNode IRGenerator::visitId(IdNode id)
 
 AstNode IRGenerator::visitProgram(shared_ptr<Program> program)
 {
-    return program;
+    return visitBody(program->body);
+}
+
+AstNode IRGenerator::visitBody(BodyNode body)
+{
+    for (const auto& stmt : body->stmts) {
+        visit(stmt);
+    }
+    return body;
 }
 
 AstNode IRGenerator::visitAssign(AssignNode assign)
 {
-    return AstNode();
+    visit(assign->expr);
+    auto src{ operateStack.top() };
+    operateStack.pop();
+
+    auto dest{ make_shared<IR::Id>(assign->id) };
+    emitAssign(src, dest);
+
+    return assign;
 }
 
 AstNode IRGenerator::visitExpr(ExprNode expr)
@@ -89,10 +104,3 @@ AstNode IRGenerator::visitUnary(UnaryNode unary)
     operateStack.push(temp);
     return unary;
 }
-
-//AssignNode IRGenerator::visitAssign(AssignNode node)
-//{
-//    IdNode id = node->id;
-//    ExprNode expr = node->expr;
-//    visitExpr(expr);
-//}

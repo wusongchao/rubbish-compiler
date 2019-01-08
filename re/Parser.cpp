@@ -247,9 +247,11 @@ ExprNode Parser::boolExpr()
         move();
 
         auto joinNode{ join() };
-        x = foldConstant(token, x, joinNode);
-        if (x == nullptr) {
+        auto constant{ foldConstant(token, x, joinNode) };
+        if (constant == nullptr) {
             x = make_shared<Or>(token, x, joinNode);
+        } else {
+            x = constant;
         }
     }
     return x;
@@ -263,9 +265,11 @@ ExprNode Parser::join()
         move();
 
         auto equalNode{ equality() };
-        x = foldConstant(token, x, equalNode);
-        if (x == nullptr) {
+        auto constant{ foldConstant(token, x, equalNode) };
+        if (constant == nullptr) {
             x = make_shared<And>(token, x, equalNode);
+        } else {
+            x = constant;
         }
     }
     return x;
@@ -279,9 +283,11 @@ ExprNode Parser::equality()
         move();
 
         auto relNode{ rel() };
-        x = foldConstant(token, x, relNode);
-        if (x == nullptr) {
+        auto constant{ foldConstant(token, x, relNode) };
+        if (constant == nullptr) {
             x = make_shared<Rel>(token, x, relNode);
+        } else {
+            x = constant;
         }
     }
     return x;
@@ -300,9 +306,11 @@ ExprNode Parser::rel()
             move();
 
             auto exprNode{ expr() };
-            x = foldConstant(token, x, exprNode);
-            if (x == nullptr) {
+            auto constant{ foldConstant(token, x, exprNode) };
+            if (constant == nullptr) {
                 x = make_shared<Rel>(token, x, exprNode);
+            } else {
+                x = constant;
             }
     }
     return x;
@@ -317,9 +325,11 @@ shared_ptr<Expr> Parser::expr()
         move();
 
         auto termNode{ term() };
-        x = foldConstant(token, x, termNode);
-        if (x == nullptr) {
+        auto constant{ foldConstant(token, x, termNode) };
+        if (constant == nullptr) {
             x = make_shared<Arith>(token, x, termNode);
+        } else {
+            x = constant;
         }
     }
     return x;
@@ -358,9 +368,11 @@ shared_ptr<Expr> Parser::term()
         move();
 
         auto unaryNode{ unary() };
-        x = foldConstant(token, x, unaryNode);
-        if (x == nullptr) {
+        auto constant{ foldConstant(token, x, unaryNode) };
+        if (constant == nullptr) {
             x = make_shared<Arith>(token, x, unaryNode);
+        } else {
+            x = constant;
         }
     }
 

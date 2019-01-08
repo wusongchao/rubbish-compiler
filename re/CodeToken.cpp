@@ -41,7 +41,7 @@ CodeToken::CodeToken(CodeTokenType type, const char * str, int rowIndex)
 }
 
 CodeToken::CodeToken(CodeToken && token) noexcept
-    :tokenType(tokenType), value(std::move(token.value)), rowIndex(token.rowIndex)
+    :tokenType(token.tokenType), value(std::move(token.value)), rowIndex(token.rowIndex)
 {
 }
 

@@ -52,7 +52,7 @@ Constant::Constant(CodeToken && token, const Type& type)
 shared_ptr<Constant> Constant::createInteger(int i)
 {
     return make_shared<Constant>(
-        CodeToken{CodeTokenType::Integer, to_string(i)}, Type::Int
+        CodeToken{ CodeTokenType::Integer, to_string(i) }, Type::Int
         );
 }
 

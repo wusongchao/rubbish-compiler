@@ -73,6 +73,10 @@ private:
         quads.emplace_back(op, src, dest);
     }
 
+    void emitAssign(VarNode src, VarNode dest) {
+        quads.emplace_back(Opcode::Assign, src, dest);
+    }
+
     int defineLabel() {
         labels.push_back(0);
 
