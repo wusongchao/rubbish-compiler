@@ -121,8 +121,10 @@ int main()
         "var a, b\n"
         "begin\n"
         "if a = 2 then\n"
-        "a := 1 + 2 + b;\n"
-        "b := a + 3 - (5 * a) * 5"
+        "a := 1 + 2 + b\n"
+        "else\n"
+        "a := a + b\n"
+        //"b := a + 3 - (5 * a) * 5\n"
         "end"
     );
     //istringstream stringStream(

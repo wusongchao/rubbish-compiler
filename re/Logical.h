@@ -6,6 +6,8 @@ public:
     Logical(const CodeToken& token, ExprNode p1, ExprNode p2, bool constant = false);
     Logical(CodeToken&& token, ExprNode p1, ExprNode p2, bool constant = false);
 
+    AstNode accept(AstVisitor& visitor) override;
+
     ExprNode expr1, expr2;
 };
 
@@ -13,18 +15,24 @@ class Or : public Logical {
 public:
     Or(const CodeToken& token, ExprNode p1, ExprNode p2, bool constant = false);
     Or(CodeToken&& token, ExprNode p1, ExprNode p2, bool constant = false);
+
+    AstNode accept(AstVisitor& visitor) override;
 };
 
 class And : public Logical {
 public:
     And(const CodeToken& token, ExprNode p1, ExprNode p2, bool constant = false);
     And(CodeToken&& token, ExprNode p1, ExprNode p2, bool constant = false);
+
+    AstNode accept(AstVisitor& visitor) override;
 };
 
 class Not : public Logical {
 public:
     Not(const CodeToken& token, ExprNode expr, bool constant = false);
     Not(CodeToken&& token, ExprNode expr, bool constant = false);
+
+    AstNode accept(AstVisitor& visitor) override;
 };
 
 class Rel : public Logical {
@@ -39,6 +47,8 @@ class Odd : public Logical {
 public:
     Odd(const CodeToken& token, ExprNode expr, bool constant = false);
     Odd(CodeToken&& token, ExprNode expr, bool constant = false);
+
+    AstNode accept(AstVisitor& visitor) override;
 };
 
 using LogicalNode = shared_ptr<Logical>;

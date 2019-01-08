@@ -2,6 +2,12 @@
 
 using std::stoi;
 
+
+// operatorStack.push, similar to return value, synthesized attributes
+// operatorStack.pop, similar to parameter, inherited attributes
+// when expand a sub procedure
+// it accept its parameter from stack
+// and return value by pushing to the stack
 AstNode IRGenerator::visitConstant(ConstantNode expr)
 {
     switch (expr->type.tag) {
@@ -66,7 +72,8 @@ AstNode IRGenerator::visitIf(IfNode ifNode)
         visit(ifNode->cond);
         auto cond{ logicalStack.top() };
         logicalStack.pop();
-
+        
+        // if lexp false, goto else block
         emitConditionJmp(getOppositeConditonJmp(cond->op), cond->src1, cond->src2, elseLabel);
 
         visit(ifNode->trueStmt);
@@ -120,6 +127,31 @@ AstNode IRGenerator::visitRead(ReadNode read)
 }
 
 AstNode IRGenerator::visitWrite(WriteNode write)
+{
+    return AstNode();
+}
+
+AstNode IRGenerator::visitLogical(LogicalNode logical)
+{
+    return visit(logical);
+}
+
+AstNode IRGenerator::visitOr(OrNode orNode)
+{
+    return AstNode();
+}
+
+AstNode IRGenerator::visitAnd(AndNode andNode)
+{
+    return AstNode();
+}
+
+AstNode IRGenerator::visitNot(NotNode notNode)
+{
+    return AstNode();
+}
+
+AstNode IRGenerator::visitOdd(OddNode oddNode)
 {
     return AstNode();
 }

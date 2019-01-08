@@ -46,6 +46,16 @@ public:
 
     AstNode visitWrite(WriteNode write) override;
 
+    AstNode visitLogical(LogicalNode logical) override;
+
+    AstNode visitOr(OrNode orNode) override;
+
+    AstNode visitAnd(AndNode andNode) override;
+
+    AstNode visitNot(NotNode notNode) override;
+
+    AstNode visitOdd(OddNode oddNode) override;
+
     AstNode visitRel(RelNode rel) override;
 
     AstNode visitArith(ArithNode arith) override;
@@ -106,7 +116,7 @@ private:
 
     // will not push logical ir to quads
     void emitLogical(Opcode op, VarNode src1, VarNode src2) {
-        auto logical{ make_shared<Quad>(Opcode::Jmp) };
+        auto logical{ make_shared<Quad>(op) };
         logical->src1 = src1;
         logical->src2 = src2;
         logicalStack.push(logical);
@@ -141,9 +151,11 @@ private:
     }
 
     // markLabel: the label jump to where
+    // insert to the proper position when the position can be determined
+    
     void markLabel(int label) {
-        // for label quad, the src1 is the label number, result is the target number
-        labels[label]->result = make_shared<IR::Integer>(quads.size() + 1);
+        // for label quad, the src1 is the label sequence number, result is the target number
+        labels[label]->result = make_shared<IR::Integer>(quads.size());
         appendQuad(labels[label]);
         // skip one quad: the label quad
     }
@@ -173,6 +185,16 @@ private:
     stack<VarNode> operateStack;
     // see the comment in visitRel, visitIf
     stack<QuadPtr> logicalStack;
+
+    // for convenience, this is used to pass property true, false
+    // to logical expression's translation process
+    // can use QuadPtr stack, but stack<int> need not to do the conversion
+    // for more information, see the comment in the head of file "IRGenerator.cpp"
+    stack<int> labelStack;
+    
+    // a special label, see the "dragon book" p261
+    static constexpr int Fall = -1;
+
     // if a then b
     // 0: if not a jmp L0
     // 1: b

@@ -155,6 +155,7 @@ shared_ptr<Stmt> Parser::stmt()
 			StmtNode s1 = stmt();
 			CodeToken token = lookahead;
 			if (lookahead.tokenType == CodeTokenType::Else) {
+                move();
 				StmtNode s2 = stmt();
 				return make_shared<If>(lexp, s1, s2);
 			}
