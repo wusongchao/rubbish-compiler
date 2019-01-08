@@ -55,3 +55,7 @@ class Temp : public Expr {
 public:
     Temp(int number, const Type& type, bool constant = false);
 };
+
+using IdNode = shared_ptr<Id>;
+using ConstantNode = shared_ptr<Constant>;
+using TempNode = shared_ptr<Temp>;

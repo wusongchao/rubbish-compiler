@@ -9,6 +9,8 @@ public:
     Op(CodeToken&& token, const Type& type, bool constant = false);
 };
 
+using OpNode = shared_ptr<Op>;
+
 class Arith : public Op {
 public:
     Arith(const CodeToken& token, ExprNode p1, ExprNode p2, bool constant = false);
@@ -19,6 +21,8 @@ public:
     ExprNode expr2;
 };
 
+using ArithNode = shared_ptr<Arith>;
+
 class Unary : public Op {
 public:
     Unary(const CodeToken& token, ExprNode expr, bool constant = false);
@@ -27,3 +31,5 @@ public:
 
     ExprNode expr;
 };
+
+using UnaryNode = shared_ptr<Unary>;

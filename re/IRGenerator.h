@@ -5,6 +5,7 @@
 #include "IR.h"
 
 using std::vector;
+using std::make_shared;
 
 class IRGenerator : public AstVisitor {
 public:
@@ -16,6 +17,35 @@ public:
     const vector<int> getLabels() const
     {
         return labels;
+    }
+
+    ExprNode visitExpr(ExprNode expr) override;
+
+    // a = a + 1 + 2 + 3
+    // => t1 = 2 + 3
+    // => t2 = 1 + t1
+    //    a = a + t2
+
+    // a = a + 1
+    // => a = a + 1
+    OpNode visitOp();
+
+    ExprNode visitArith(ArithNode node);
+
+    //AssignNode visitAssign(AssignNode node);
+private:
+    void emitGoto(int label) {
+        quads.emplace_back();
+    }
+
+    //TempNode emitBinary(const CodeToken& opToken, const Type& resType, const ExprNode& lhs, const ExprNode& rhs);
+
+    TempNode createTemp(const Type& type) {
+        return make_shared<Temp>(tempIndex++, type);
+    }
+
+    void emitConditionJmp() {
+
     }
 
     int defineLabel() {
@@ -30,9 +60,7 @@ public:
         labels[label] = quads.size();
     }
 
-    ExprNode visitExpr(ExprNode expr) override;
-
-private:
+    int tempIndex = 1;
     vector<Quad> quads;
     vector<int> labels;
     // label number -> offset address

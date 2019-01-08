@@ -14,6 +14,7 @@ enum class Opcode {
     // Unary operator
     Neg,
     Not,
+    Assign,
 
     Load,     // similar to read
     Store,     // similar to write
@@ -32,6 +33,8 @@ enum class VarTag {
 struct Var {
     VarTag tag = VarTag::Empty;
     shared_ptr<Expr> variable = nullptr;
+
+    const static Var Empty;
 };
 
 string opcodeToString(Opcode opcode);
@@ -40,9 +43,12 @@ string opcodeToString(Opcode opcode);
 struct Quad {
     Opcode op;
 
-    Var src1;
-    Var src2;
-    Var dest;
+    Var src1 = Var::Empty;
+    Var src2 = Var::Empty;
+    Var dest = Var::Empty;
+
+    //Quad(Opcode opcode, const Var& src);
+    //Quad(Opcode opcode, const Var& src, const Var& dest);
 
     string toString();
 };

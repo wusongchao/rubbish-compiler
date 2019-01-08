@@ -1,4 +1,10 @@
+#include <sstream>
+
 #include "IR.h"
+
+using std::ostringstream;
+
+const static Var Empty;
 
 string opcodeToString(Opcode opcode)
 {
@@ -11,6 +17,12 @@ string opcodeToString(Opcode opcode)
             return "*";
         case Opcode::Div:
             return "/";
+        case Opcode::Neg:
+            return "-";
+        case Opcode::Not:
+            return "!";
+        case Opcode::Assign:
+            return "=";
         case Opcode::Load:
             return "";
         case Opcode::Store:
@@ -32,6 +44,10 @@ string opcodeToString(Opcode opcode)
 
 string Quad::toString()
 {
+    ostringstream stream;
+
+    stream << '(';
+
     switch (op) {
         case Opcode::Add:
         case Opcode::Sub:
