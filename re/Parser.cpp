@@ -180,23 +180,27 @@ shared_ptr<Stmt> Parser::stmt()
 			match(CodeTokenType::Id);
 			auto func = funcTop->getSymbol(token);
 			if (func == nullptr || func->id == nullptr) {
-				semanticError("function undefined identifier: " + token.value + "in line:" + to_string(token.rowIndex));
+				semanticError("function undefined " + token.value + "in line:" + to_string(token.rowIndex));
 			}
-			auto exprs = std::vector< ExprNode >();
-			do
+			auto params = std::vector< ExprNode >();
+			match(CodeTokenType::OpenParenthesis);
+			token = lookahead;
+			while (token.tokenType == CodeTokenType::Id)
 			{
-				auto exp = expr();
-				exprs.push_back(exp);
+				params.push_back(expr());
 				token = lookahead;
-				move();
-			} while (token.tokenType == CodeTokenType::CloseParenthesis);
+				if (token.tokenType == CodeTokenType::Comma) {
+					match(CodeTokenType::Semicolon);
+				}else break;
+			} 
 			if (token.tokenType != CodeTokenType::CloseParenthesis) {
-				syntaxError(string("miss ')' in  line: ") + to_string(lookahead.rowIndex));
+				syntaxError(string("miss ')' in  line ") + to_string(lookahead.rowIndex));
 			}
-			if (exprs.size() != func->paramType.size()) {
-				syntaxError(string("No find overload function") + to_string(lookahead.rowIndex));
+			match(CodeTokenType::CloseParenthesis);
+			if (params.size() != func->paramType.size()) {
+				syntaxError(string("No find overload function ") + lookahead.value +string(" in line ")+ to_string(lookahead.rowIndex));
 			}
-			return make_shared<Call>(func->id, exprs);
+			return make_shared<Call>(func->id, params);
 		}
             break;
         case CodeTokenType::Begin:
@@ -218,12 +222,11 @@ shared_ptr<Stmt> Parser::stmt()
 				if (id == nullptr) {
 					semanticError("reference to undefined identifier: " + token.value + "in line:" + to_string(token.rowIndex));
 				}
-				auto ids = std::vector< shared_ptr<Id> >();
 				ids.push_back(id);
 				token = lookahead;
 				move();
 			}while (token.tokenType == CodeTokenType::Comma);
-			//match(CodeTokenType::CloseParenthesis);	moved in loop
+			//match(CodeTokenType::CloseParenthesis);	//moved in loop
 			if(token.tokenType!=CodeTokenType::CloseParenthesis)
 				SyntaxError(string("miss ')' in  line: ") + to_string(lookahead.rowIndex));
 			return make_shared<Read>(ids);
@@ -242,7 +245,7 @@ shared_ptr<Stmt> Parser::stmt()
 				exprs.push_back(exp);
 				token = lookahead;
 				move();
-			} while (token.tokenType == CodeTokenType::CloseParenthesis);
+			} while (token.tokenType != CodeTokenType::CloseParenthesis);
 			if (token.tokenType != CodeTokenType::CloseParenthesis) {
 				SyntaxError(string("miss ')' in  line: ") + to_string(lookahead.rowIndex));
 			}
@@ -366,15 +369,6 @@ BodyNode Parser::body()
         stmts.push_back(stmt());
     }
     match(CodeTokenType::End);
- //   do {
-	//	auto a_stmt = stmt();
-	//	stmtss.push_back(a_stmt);
-	//	token = lookahead;
-	//	move();
-	//} while (token.tokenType == CodeTokenType::Semicolon);
-	//if (token.tokenType != CodeTokenType::End) {
-	//	SyntaxError(string("miss 'end' in  line: ") + to_string(lookahead.rowIndex));
-	//}
 	return make_shared<Body>(stmts);
 }
 

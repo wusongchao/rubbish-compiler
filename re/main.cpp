@@ -83,85 +83,80 @@ void defineTokens(Lexicon& lexicon)
     );
 }
 
+void test1() {
+	Lexicon lexicon;
+	defineTokens(lexicon);
+
+	std::ifstream infile("Stmt.txt");
+	if (!infile.is_open())
+	{
+		cout << "can`t open file testStmt.txt" << endl;
+	}
+	istream& stream = infile;
+
+	Scanner scanner(stream, lexicon.createScannerInfo());
+	scanner.addSkipToken(CodeTokenType::WhiteSpace);
+	scanner.addSkipToken(CodeTokenType::LineBreaker);
+	scanner.addSkipToken(CodeTokenType::Comment);
+
+	Parser parser(scanner);
+	parser.program();
+	infile.close();
+}
+
+void test2() {
+	Lexicon lexicon;
+
+	defineTokens(lexicon);
+
+	//istringstream stringStream(
+	//    "program fuck;"
+	//    "begin\n"
+	//    "if i = 4 then\n"
+	//    "t = 342+5\n"
+	//    "//fuck you\n"
+	//    "end"
+	//);
+	istringstream stringStream(
+		"program fuck;\n"
+		"const i := 1\n"
+		"var a, b\n"
+		"begin\n"
+		"if a = 2 then\n"
+		"a := 1 + 2 + b;\n"
+		"b := a + 3 - (5 * a) * 5"
+		"end"
+	);
+
+	istream& stream = stringStream;
+
+	Scanner scanner(stream, lexicon.createScannerInfo());
+	scanner.addSkipToken(CodeTokenType::WhiteSpace);
+	scanner.addSkipToken(CodeTokenType::LineBreaker);
+	scanner.addSkipToken(CodeTokenType::Comment);
+
+
+	Parser parser(scanner);
+	try {
+		auto p = parser.program();
+		IRGenerator generator;
+		generator.visit(p);
+
+		auto quad = generator.getQuads()[0];
+		while (quad != nullptr) {
+			std::cout << quad->toString() << std::endl;
+			quad = quad->next;
+		}
+	}
+	catch (const CompileError& error) {
+		std::cout << error.info << std::endl;
+	}
+	cin.get();
+}
 
 int main()
 {
-
-
-	//Lexicon lexicon;
-	//std::ifstream infile("Stmt.txt");
-	//if (!infile.is_open())
-	//{
-	//	cout << "can`t open file testStmt.txt" << endl;
-	//}
-	//istream& stream = infile;
-	//Scanner scanner(stream, lexicon.createScannerInfo());
-	//scanner.addSkipToken(CodeTokenType::WhiteSpace);
-	//scanner.addSkipToken(CodeTokenType::LineBreaker);
-	//scanner.addSkipToken(CodeTokenType::Comment);
-
-	//Parser parser(scanner);
-	//parser.program();
-	
-    Lexicon lexicon;
-
-    defineTokens(lexicon);
-
-    //istringstream stringStream(
-    //    "program fuck;"
-    //    "begin\n"
-    //    "if i = 4 then\n"
-    //    "t = 342+5\n"
-    //    "//fuck you\n"
-    //    "end"
-    //);
-    istringstream stringStream(
-        "program fuck;\n"
-        "const i := 1\n"
-        "var a, b\n"
-        "begin\n"
-        "if a = 2 then\n"
-        "a := 1 + 2 + b;\n"
-        "b := a + 3 - (5 * a) * 5"
-        "end"
-    );
-    //istringstream stringStream(
-    //    "4\n"
-    //);
-
-    istream& stream = stringStream;
-
-    Scanner scanner(stream, lexicon.createScannerInfo());
-    scanner.addSkipToken(CodeTokenType::WhiteSpace);
-    scanner.addSkipToken(CodeTokenType::LineBreaker);
-    scanner.addSkipToken(CodeTokenType::Comment);
-    
-    Parser parser(scanner);
-    try {
-        auto p = parser.program();
-        IRGenerator generator;
-        generator.visit(p);
-
-        auto quad = generator.getQuads()[0];
-        while (quad != nullptr) {
-            std::cout << quad->toString() << std::endl;
-            quad = quad->next;
-        }
-    }
-    catch (const CompileError& error) {
-        std::cout << error.info << std::endl;
-    }
-   
-
-    //while (!scanner.isFinish()) {
-    //    CodeToken token = scanner.read();
-    //    cout << (int)token.tokenType << ' ' << token.value << ' ' << token.rowIndex << endl;
-    //}
-
-    //token = scanner.read();
-    //cout << (int)token.tokenType << endl;
-    cin.get();
-
-	
+	test1();
+	//test2();
     return 0;
 }
