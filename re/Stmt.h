@@ -1,7 +1,7 @@
 #pragma once
 #include "Ast.h"
 #include "Expr.h"
-class Stmt;
+//class Stmt;
 
 class Stmt :
 	public Ast
@@ -61,6 +61,26 @@ public:
 
 class Body : public Stmt{
 public:
-	Body(std::vector<StmtNode> stmts);
-	std::vector<StmtNode> stmts;
+	Body(const vector<StmtNode>& stmts);
+    Body(vector<StmtNode>&& stmts);
+    vector<StmtNode> stmts;
+
+    AstNode accept(AstVisitor& visitor) override;
 };
+
+using BodyNode = shared_ptr<Body>;
+
+class Program : public Ast {
+public:
+    virtual AstNode accept(AstVisitor& visitor) override;
+
+    BodyNode body;
+
+    Program(BodyNode body);
+private:
+};
+
+using ProgramNode = shared_ptr<Program>;
+
+using AssignNode = shared_ptr<Assign>;
+

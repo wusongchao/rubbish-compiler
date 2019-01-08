@@ -30,6 +30,11 @@ AstNode IRGenerator::visitProgram(shared_ptr<Program> program)
     return program;
 }
 
+AstNode IRGenerator::visitAssign(AssignNode assign)
+{
+    return AstNode();
+}
+
 AstNode IRGenerator::visitExpr(ExprNode expr)
 {
     return visit(expr);

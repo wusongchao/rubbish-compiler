@@ -105,6 +105,7 @@ string opcodeToString(Opcode opcode)
         case Opcode::Label:
             return "label";
     }
+    return "";
 }
 
 Quad::Quad(Opcode opcode)
@@ -127,7 +128,7 @@ Quad::Quad(Opcode opcode, VarNode src1, VarNode src2, VarNode dest)
 {
 }
 
-string Quad::toString()
+string Quad::toString() const
 {
     ostringstream stream;
     stream << '(' << opcodeToString(op) << ", ";

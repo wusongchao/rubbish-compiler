@@ -5,7 +5,6 @@
 #include <iostream>
 #include <vector>
 
-
 using std::make_shared;
 using std::to_string;
 using std::stoi;
@@ -16,9 +15,8 @@ shared_ptr<Program> Parser::program()
     match(CodeTokenType::Program);
     match(CodeTokenType::Id);
     match(CodeTokenType::Semicolon);
-	block();
-
-    return nullptr;
+    
+    return make_shared<Program>(block());
 }
 
 Parser::Parser(Scanner & scanner)
@@ -27,7 +25,7 @@ Parser::Parser(Scanner & scanner)
     move();
 }
 
-shared_ptr<Stmt> Parser::block()
+BodyNode Parser::block()
 // <block> ¡ú [<condecl>][<vardecl>][<proc>]<body>
 {
     // now current pointer is managed by both savedEnv and top
@@ -44,15 +42,13 @@ shared_ptr<Stmt> Parser::block()
 
     condecls();
     vardecls();
-	
+
+    auto res{ body() };
+
     top = savedEnv;
     constTop = savedConstEnv;
 
-	body();
-
-
-    return nullptr;
-    //return shared_ptr<Stmt>();
+    return res;
 }
 
 void Parser::condecls()
@@ -143,6 +139,7 @@ shared_ptr<Stmt> Parser::stmt()
 			if (id == nullptr) {
 				semanticError("reference to undefined identifier: " + token.value + "in line:" + to_string(token.rowIndex));
 			}
+            match(CodeTokenType::Assign);
 			ExprNode exp = expr();
 			return make_shared<Assign>(id, exp);
 		}
@@ -328,22 +325,28 @@ shared_ptr<Expr> Parser::expr()
     return x;
 }
 
-StmtNode Parser::body()
+BodyNode Parser::body()
 {
 	//<body> ¡ú begin <statement>{;<statement>}end
 	match(CodeTokenType::Begin);
 	CodeToken token;
-	std::vector<StmtNode> stmtss = std::vector<StmtNode>();
-	do {
-		auto a_stmt = stmt();
-		stmtss.push_back(a_stmt);
-		token = lookahead;
-		move();
-	} while (token.tokenType == CodeTokenType::Semicolon);
-	if (token.tokenType != CodeTokenType::End) {
-		SyntaxError(string("miss 'end' in  line: ") + to_string(lookahead.rowIndex));
-	}
-	return make_shared<Body>(stmtss);
+	std::vector<StmtNode> stmts;
+    stmts.push_back(stmt());
+    while (lookahead.tokenType == CodeTokenType::Semicolon) {
+        match(CodeTokenType::Semicolon);
+        stmts.push_back(stmt());
+    }
+    match(CodeTokenType::End);
+ //   do {
+	//	auto a_stmt = stmt();
+	//	stmtss.push_back(a_stmt);
+	//	token = lookahead;
+	//	move();
+	//} while (token.tokenType == CodeTokenType::Semicolon);
+	//if (token.tokenType != CodeTokenType::End) {
+	//	SyntaxError(string("miss 'end' in  line: ") + to_string(lookahead.rowIndex));
+	//}
+	return make_shared<Body>(stmts);
 }
 
 shared_ptr<Expr> Parser::term()
@@ -455,7 +458,7 @@ shared_ptr<Expr> Parser::factor()
             return res;
         }
         default:
-            SyntaxError(string("syntax Error near line: ") + to_string(lookahead.rowIndex));
+            SyntaxError(string("syntax Error near line: ") + to_string(lookahead.rowIndex) + ' ' + lookahead.value);
             break;
     }
     return nullptr;
@@ -556,6 +559,6 @@ void Parser::match(CodeTokenType tokenType)
     if (lookahead.tokenType == tokenType) {
         move();
     } else {
-        syntaxError("expect wrong token type near line: " + to_string(lookahead.rowIndex));
+        syntaxError("expect wrong token type near line: " + to_string(lookahead.rowIndex) + ' ' + lookahead.value);
     }
 }

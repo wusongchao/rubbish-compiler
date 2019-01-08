@@ -29,6 +29,10 @@ public:
 
     AstNode visitProgram(shared_ptr<Program> program) override;
 
+    AstNode visitBody(BodyNode body) override;
+
+    AstNode visitAssign(AssignNode assign) override;
+
     AstNode visitExpr(ExprNode expr) override;
 
     AstNode visitArith(ArithNode arith) override;
@@ -44,7 +48,7 @@ public:
 
 private:
     void emitGoto(int label) {
-        quads.emplace_back();
+        //quads.emplace_back();
     }
 
     //TempNode emitBinary(const CodeToken& opToken, const Type& resType, const ExprNode& lhs, const ExprNode& rhs);

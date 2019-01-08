@@ -15,7 +15,7 @@ public:
 
     Parser(Scanner& scanner);
 private:
-    shared_ptr<Stmt> block();
+    BodyNode block();
 
     void condecls();
 
@@ -33,15 +33,15 @@ private:
 
     StmtNode stmt();
 
-	StmtNode body();
+	BodyNode body();
 
-    shared_ptr<Expr> expr();
+    ExprNode expr();
 
-    shared_ptr<Expr> term();
+    ExprNode term();
 
-    shared_ptr<Expr> unary();
+    ExprNode unary();
 
-    shared_ptr<Expr> factor();
+    ExprNode factor();
 
     shared_ptr<Constant> foldConstant(const CodeToken& opToken, ExprNode expr);
     shared_ptr<Constant> foldConstant(const CodeToken& opToken, ExprNode lhs, ExprNode rhs);

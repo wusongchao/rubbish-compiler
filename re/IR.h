@@ -71,6 +71,7 @@ public:
 };
 
 class Bool : public Constant {
+public:
     bool value;
 
     Bool(bool value);
@@ -94,7 +95,7 @@ struct Quad {
     Quad(Opcode opcode, VarNode src1, VarNode src2, VarNode dest);
 
     // (op, src1, src2, dest)
-    string toString();
+    string toString() const;
 };
 
 

@@ -32,11 +32,3 @@ public:
 
 using AstNode = shared_ptr<Ast>;
 
-class Program : public Ast {
-public:
-    virtual AstNode accept(AstVisitor& visitor) override;
-
-private:
-};
-
-

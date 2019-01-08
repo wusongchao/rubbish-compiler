@@ -3,8 +3,7 @@
 
 shared_ptr<Ast> Assign::accept(AstVisitor & visitor)
 {
-	//visitor.visitAssign(static_pointer_cast<Assign>(enable_shared_from_this()));
-	return nullptr;
+	return visitor.visitAssign(static_pointer_cast<Assign>(shared_from_this()));
 }
 
 
@@ -58,7 +57,17 @@ Write::Write(std::vector< ExprNode > data)
 {
 }
 
-Body::Body(std::vector<StmtNode> stmts_)
+Body::Body(const vector<StmtNode>& stmts_)
 	:stmts(stmts_)
 {
+}
+
+Body::Body(vector<StmtNode>&& stmts)
+    :stmts(std::move(stmts))
+{
+}
+
+AstNode Body::accept(AstVisitor & visitor)
+{
+    return visitor.visitBody(static_pointer_cast<Body>(shared_from_this()));
 }

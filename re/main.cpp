@@ -87,21 +87,21 @@ int main()
 {
 
 
-	Lexicon lexicon;
-	std::ifstream infile("Stmt.txt");
-	if (!infile.is_open())
-	{
-		cout << "can`t open file testStmt.txt" << endl;
-	}
-	istream& stream = infile;
-	Scanner scanner(stream, lexicon.createScannerInfo());
-	scanner.addSkipToken(CodeTokenType::WhiteSpace);
-	scanner.addSkipToken(CodeTokenType::LineBreaker);
-	scanner.addSkipToken(CodeTokenType::Comment);
+	//Lexicon lexicon;
+	//std::ifstream infile("Stmt.txt");
+	//if (!infile.is_open())
+	//{
+	//	cout << "can`t open file testStmt.txt" << endl;
+	//}
+	//istream& stream = infile;
+	//Scanner scanner(stream, lexicon.createScannerInfo());
+	//scanner.addSkipToken(CodeTokenType::WhiteSpace);
+	//scanner.addSkipToken(CodeTokenType::LineBreaker);
+	//scanner.addSkipToken(CodeTokenType::Comment);
 
-	Parser parser(scanner);
-	parser.program();
-	/*
+	//Parser parser(scanner);
+	//parser.program();
+	
     Lexicon lexicon;
 
     defineTokens(lexicon);
@@ -114,14 +114,17 @@ int main()
     //    "//fuck you\n"
     //    "end"
     //);
-    //istringstream stringStream(
-    //    "program fuck;\n"
-    //    "const id := 1\n"
-    //    "var a, b\n"
-    //);
     istringstream stringStream(
-        "4+5+1+(3-5)*2*(1)\n"
+        "program fuck;\n"
+        "const i := 1\n"
+        "var a, b\n"
+        "begin\n"
+        "a := 1 + 2 + i\n"
+        "end"
     );
+    //istringstream stringStream(
+    //    "4\n"
+    //);
 
     istream& stream = stringStream;
 
@@ -148,6 +151,6 @@ int main()
     //cout << (int)token.tokenType << endl;
     cin.get();
 
-	*/
+	
     return 0;
 }
