@@ -34,6 +34,11 @@ Id::Id(CodeToken && token, const Type& type, int offset, bool constant)
 {
 }
 
+AstNode Id::accept(AstVisitor & visitor)
+{
+    return visitor.visitId(static_pointer_cast<Id>(shared_from_this()));
+}
+
 Constant::Constant(const CodeToken & token, const Type& type)
     :Expr(token, type, true)
 {
@@ -63,6 +68,11 @@ shared_ptr<Constant> Constant::createBool(bool b)
             );
     }
 
+}
+
+AstNode Constant::accept(AstVisitor & visitor)
+{
+    return visitor.visitConstant(static_pointer_cast<Constant>(shared_from_this()));
 }
 
 Temp::Temp(int number, const Type & type, bool constant)

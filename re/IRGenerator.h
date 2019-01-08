@@ -1,14 +1,22 @@
 #pragma once
 #include <vector>
+#include <stack>
 
 #include "AstVisitor.h"
 #include "IR.h"
 
 using std::vector;
 using std::make_shared;
+using std::stack;
 
-class IRGenerator : public AstVisitor {
+using IR::Quad;
+using IR::Var;
+using IR::VarNode;
+using IR::Opcode;
+
+class IRGenerator : public AstVisitor{
 public:
+
     const vector<Quad>& getQuads() const
     {
         return quads;
@@ -19,20 +27,21 @@ public:
         return labels;
     }
 
-    ExprNode visitExpr(ExprNode expr) override;
+    AstNode visitProgram(shared_ptr<Program> program) override;
 
-    // a = a + 1 + 2 + 3
-    // => t1 = 2 + 3
-    // => t2 = 1 + t1
-    //    a = a + t2
+    AstNode visitExpr(ExprNode expr) override;
 
-    // a = a + 1
-    // => a = a + 1
-    OpNode visitOp();
+    AstNode visitArith(ArithNode arith) override;
 
-    ExprNode visitArith(ArithNode node);
+    AstNode visitOp(OpNode op) override;
 
-    //AssignNode visitAssign(AssignNode node);
+    AstNode visitUnary(UnaryNode unary) override;
+
+    AstNode visitConstant(ConstantNode constant) override;
+
+    AstNode visitId(IdNode id) override;
+
+
 private:
     void emitGoto(int label) {
         quads.emplace_back();
@@ -40,12 +49,24 @@ private:
 
     //TempNode emitBinary(const CodeToken& opToken, const Type& resType, const ExprNode& lhs, const ExprNode& rhs);
 
-    TempNode createTemp(const Type& type) {
-        return make_shared<Temp>(tempIndex++, type);
+    shared_ptr<IR::Temp> createTemp(const Type& type) {
+        return make_shared<IR::Temp>(tempIndex++, type);
+    }
+
+    shared_ptr<IR::Temp> createTemp(int width) {
+        return make_shared<IR::Temp>(tempIndex++, width);
     }
 
     void emitConditionJmp() {
 
+    }
+
+    void emitArith(Opcode op, VarNode src1, VarNode src2, VarNode dest) {
+        quads.emplace_back(op, src1, src2, dest);
+    }
+
+    void emitUnary(Opcode op, VarNode src, VarNode dest) {
+        quads.emplace_back(op, src, dest);
     }
 
     int defineLabel() {
@@ -63,6 +84,7 @@ private:
     int tempIndex = 1;
     vector<Quad> quads;
     vector<int> labels;
+    stack<shared_ptr<Var>> operateStack;
     // label number -> offset address
     // L1:L3:
     //   i = i + 1

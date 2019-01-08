@@ -7,6 +7,8 @@ public:
     Op(const CodeToken& token, const Type& type, bool constant = false);
 
     Op(CodeToken&& token, const Type& type, bool constant = false);
+
+    AstNode accept(AstVisitor& visitor) override;
 };
 
 using OpNode = shared_ptr<Op>;
@@ -19,6 +21,8 @@ public:
 
     ExprNode expr1;
     ExprNode expr2;
+
+    AstNode accept(AstVisitor& visitor) override;
 };
 
 using ArithNode = shared_ptr<Arith>;
@@ -30,6 +34,8 @@ public:
     Unary(CodeToken&& token, ExprNode expr, bool constant = false);
 
     ExprNode expr;
+
+    AstNode accept(AstVisitor& visitor) override;
 };
 
 using UnaryNode = shared_ptr<Unary>;

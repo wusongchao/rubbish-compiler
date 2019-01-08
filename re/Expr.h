@@ -37,6 +37,8 @@ public:
 
     Id(CodeToken&& token, const Type& type, int offset, bool constant = false);
 
+    AstNode accept(AstVisitor& visitor) override;
+
     int offset;
 };
 
@@ -49,6 +51,8 @@ public:
     shared_ptr<Constant> static createInteger(int i);
 
     shared_ptr<Constant> static createBool(bool b);
+
+    AstNode accept(AstVisitor& visitor) override;
 };
 
 class Temp : public Expr {

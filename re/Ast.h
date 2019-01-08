@@ -13,6 +13,16 @@ class AstVisitor;
 // enable_shared_from_this is needed
 // since sometimes the class have to return a shared_ptr(this)
 
+// accept: return visitor.visit(this)
+// visitor::visit:
+// return node.accept(this)
+// visitArith:
+//    visitExpr(lhs)
+//    visitExpr(rhs)
+//    return Var
+// 
+// Var visitor::visit(ExprNode)
+// Var
 class Ast : public enable_shared_from_this<Ast> {
 public:
     virtual shared_ptr<Ast> accept(AstVisitor& visitor) = 0;

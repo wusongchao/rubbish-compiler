@@ -314,7 +314,12 @@ shared_ptr<Expr> Parser::factor()
                 semanticError("reference to undefined identifier: " + token.value + "in line:" + to_string(token.rowIndex));
             }
             match(CodeTokenType::Id);
-            return id;
+            auto constant{ constTop->getSymbol(token) };
+            if (constant != nullptr) {
+                return constant;
+            } else {
+                return id;
+            }
         }
         case CodeTokenType::Integer:
         {
