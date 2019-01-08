@@ -11,11 +11,14 @@ using std::shared_ptr;
 
 class Parser {
 public:
-    shared_ptr<Program> program();
+    ProgramNode program();
 
     Parser(Scanner& scanner);
 private:
-    BodyNode block();
+
+	ProcNode proc();
+
+    BlockNode block();
 
     void condecls();
 
@@ -41,7 +44,7 @@ private:
 
     ExprNode unary();
 
-    ExprNode factor();
+	ExprNode factor();
 
     shared_ptr<Constant> foldConstant(const CodeToken& opToken, ExprNode expr);
     shared_ptr<Constant> foldConstant(const CodeToken& opToken, ExprNode lhs, ExprNode rhs);
@@ -76,6 +79,7 @@ private:
     CodeToken lookahead;
     shared_ptr<Env> top{ nullptr };
     shared_ptr<ConstEnv> constTop{ nullptr };
+	shared_ptr<FuncEnv> funcTop = std::make_shared<FuncEnv>();
 
     int usedOffset = 0;
 };

@@ -5,7 +5,7 @@ var
   b,c
 procedure p();
 begin
-  c := b + a;
+  c := b + a
 end
 begin
   read(b,b,b,b);

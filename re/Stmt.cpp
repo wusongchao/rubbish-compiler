@@ -80,3 +80,23 @@ AstNode Body::accept(AstVisitor & visitor)
 {
     return visitor.visitBody(static_pointer_cast<Body>(shared_from_this()));
 }
+
+AstNode Block::accept(AstVisitor & visitor)
+{
+	return AstNode();
+}
+
+Block::Block(ProcNode proc_, BodyNode body_)
+	:pde(proc_), body(body_)
+{
+}
+
+AstNode Proc::accept(AstVisitor & visitor)
+{
+	return AstNode();
+}
+
+Proc::Proc(IdNode id_, BlockNode block_, std::vector<ProcNode> procs_)
+	:id(id_), block(block_), procs(procs_)
+{
+}

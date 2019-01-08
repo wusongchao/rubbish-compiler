@@ -15,8 +15,8 @@ shared_ptr<Program> Parser::program()
     match(CodeTokenType::Program);
     match(CodeTokenType::Id);
     match(CodeTokenType::Semicolon);
-    
-    return make_shared<Program>(block());
+	auto blockRes = block();
+    return make_shared<Program>(blockRes->body,blockRes->pde);
 }
 
 Parser::Parser(Scanner & scanner)
@@ -25,7 +25,7 @@ Parser::Parser(Scanner & scanner)
     move();
 }
 
-BodyNode Parser::block()
+BlockNode Parser::block()
 // <block> ¡ú [<condecl>][<vardecl>][<proc>]<body>
 {
     // now current pointer is managed by both savedEnv and top
@@ -39,16 +39,19 @@ BodyNode Parser::block()
     auto savedConstEnv{ constTop };
     constTop = make_shared<ConstEnv>(constTop);
 
-
     condecls();
     vardecls();
 
-    auto res{ body() };
+	ProcNode procRes;
+	if (lookahead.tokenType == CodeTokenType::Procedure) {
+		procRes = proc();
+	}
+    BodyNode bodyRes{ body() };
 
     top = savedEnv;
     constTop = savedConstEnv;
-
-    return res;
+	
+    return make_shared<Block>(procRes,bodyRes);
 }
 
 void Parser::condecls()
@@ -175,12 +178,25 @@ shared_ptr<Stmt> Parser::stmt()
 			match(CodeTokenType::Call);
 			CodeToken token = lookahead;
 			match(CodeTokenType::Id);
-			auto id = top->getSymbol(token);
-			if (id == nullptr) {
+			auto func = funcTop->getSymbol(token);
+			if (func == nullptr || func->id == nullptr) {
 				semanticError("function undefined identifier: " + token.value + "in line:" + to_string(token.rowIndex));
 			}
-
-			///
+			auto exprs = std::vector< ExprNode >();
+			do
+			{
+				auto exp = expr();
+				exprs.push_back(exp);
+				token = lookahead;
+				move();
+			} while (token.tokenType == CodeTokenType::CloseParenthesis);
+			if (token.tokenType != CodeTokenType::CloseParenthesis) {
+				syntaxError(string("miss ')' in  line: ") + to_string(lookahead.rowIndex));
+			}
+			if (exprs.size() != func->paramType.size()) {
+				syntaxError(string("No find overload function") + to_string(lookahead.rowIndex));
+			}
+			return make_shared<Call>(func->id, exprs);
 		}
             break;
         case CodeTokenType::Begin:
@@ -477,6 +493,34 @@ shared_ptr<Expr> Parser::factor()
             break;
     }
     return nullptr;
+}
+
+ProcNode Parser::proc()
+{
+	//<proc> ¡ú procedure <id>£¨[<id>{,<id>}]£©;<block>{;<proc>}
+	match(CodeTokenType::Procedure);
+	CodeToken token = lookahead;
+	match(CodeTokenType::Id);
+	auto afunc = make_shared<FuncScripter>();
+	afunc->id = make_shared<Id>(token, Type::Func, 0);
+	match(CodeTokenType::OpenParenthesis);
+	while (lookahead.tokenType == CodeTokenType::Id)
+	{
+		afunc->paramType.push_back(Type::Int);
+		if (lookahead.tokenType == CodeTokenType::Comma) {
+			match(CodeTokenType::Comma);
+		}
+	}
+	match(CodeTokenType::CloseParenthesis);
+	funcTop->putSymbol(token.value, afunc);
+	match(CodeTokenType::Semicolon);
+	auto b = block();
+	auto procs = std::vector<ProcNode>();
+	while (lookahead.tokenType == CodeTokenType::Semicolon) {
+		match(CodeTokenType::Semicolon);
+		procs.push_back(proc());
+	}
+	return make_shared<Proc>(afunc->id, b, procs);
 }
 
 shared_ptr<Constant> Parser::foldConstant(const CodeToken& opToken, ExprNode expr)

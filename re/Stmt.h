@@ -1,8 +1,10 @@
 #pragma once
 #include "Ast.h"
 #include "Expr.h"
-//class Stmt;
-
+class Proc;
+class Block;
+using ProcNode = shared_ptr<Proc>;
+using BlockNode = shared_ptr < Block>;
 class Stmt :
 	public Ast
 {
@@ -75,11 +77,28 @@ using BodyNode = shared_ptr<Body>;
 class Program : public Ast {
 public:
     virtual AstNode accept(AstVisitor& visitor) override;
-
     BodyNode body;
-
+	ProcNode proc;
     Program(BodyNode body);
+	Program(BodyNode body, ProcNode proc);
 private:
+};
+
+class Block : public Ast {
+public:
+	virtual AstNode accept(AstVisitor& visitor) override;
+	Block(ProcNode p, BodyNode b);
+	BodyNode body;
+	ProcNode pde;	//procedure
+};
+
+class Proc :public Ast {
+public:
+	virtual AstNode accept(AstVisitor& visitor) override;
+	Proc(IdNode id_, BlockNode block_, std::vector<ProcNode> procs_);
+	IdNode id;
+	BlockNode block;
+	std::vector< shared_ptr<Proc> > procs;
 };
 
 using ProgramNode = shared_ptr<Program>;
@@ -95,4 +114,3 @@ using CallNode = shared_ptr<Call>;
 using ReadNode = shared_ptr<Read>;
 
 using writeNode = shared_ptr<Write>;
-

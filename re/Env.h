@@ -19,9 +19,9 @@ public:
 
     shared_ptr<Id> getSymbol(const CodeToken& token) {
         Env* cur = this;
-        auto endIter = table.end();
         while (cur != nullptr) {
-            auto it = table.find(token.value);
+			auto endIter = cur->table.end();
+            auto it = cur->table.find(token.value);
             if (it != endIter) {
                 return it->second;
             }
@@ -51,9 +51,9 @@ public:
 
     shared_ptr<Constant> getSymbol(const CodeToken& token) {
         ConstEnv* cur = this;
-        auto endIter = table.end();
         while (cur != nullptr) {
-            auto it = table.find(token.value);
+			auto endIter = cur->table.end();
+            auto it = cur->table.find(token.value);
             if (it != endIter) {
                 return it->second;
             }
@@ -90,7 +90,6 @@ public:
 		table.insert({ name, funcscrip });
 	}
 	shared_ptr<FuncScripter> getSymbol(const CodeToken& token) {
-		FuncEnv* cur = this;
 		auto endIter = table.end();
 		auto it = table.find(token.value);
 		if (it != endIter) {
