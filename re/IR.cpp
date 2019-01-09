@@ -103,9 +103,11 @@ string opcodeToString(Opcode opcode)
         case Opcode::Assign:
             return "=";
         case Opcode::Load:
-            return "";
+            return "load";
         case Opcode::Store:
-            return "";
+            return "store";
+        case Opcode::Write:
+            return "write";
         case Opcode::Jlt:
             return "j<";
         case Opcode::Jle:

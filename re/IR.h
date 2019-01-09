@@ -27,7 +27,8 @@ enum class Opcode {
     Assign,
 
     Load,     // similar to read
-    Store,     // similar to write
+    Store,     
+    Write,
     Jlt,
     Jle,
     Jgt,

@@ -8,6 +8,7 @@
 using std::vector;
 using std::make_shared;
 using std::stack;
+using std::ostream;
 
 using IR::Quad;
 using IR::QuadPtr;
@@ -26,6 +27,19 @@ public:
     const vector<QuadPtr> getLabels() const
     {
         return labels;
+    }
+
+    void output(ostream& output) const
+    {
+        if (quads.empty()) {
+            return;
+        }
+
+        auto quad = quads[0];
+        while (quad != nullptr) {
+            output << quad->toString() << std::endl;
+            quad = quad->next;
+        }
     }
 
     AstNode visitProgram(shared_ptr<Program> program) override;
@@ -181,6 +195,14 @@ private:
 
     void emitParam(VarNode param) {
         appendQuad(make_shared<Quad>(Opcode::Param, param));
+    }
+
+    void emitRead(VarNode id) {
+        appendQuad(make_shared<Quad>(Opcode::Load, id));
+    }
+
+    void emitWrite(VarNode exp) {
+        appendQuad(make_shared<Quad>(Opcode::Write, exp));
     }
 
     void emitCall(VarNode funcName) {

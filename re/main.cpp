@@ -147,11 +147,7 @@ void test2() {
 		IRGenerator generator;
 		generator.visit(p);
 
-		auto quad = generator.getQuads()[0];
-		while (quad != nullptr) {
-			std::cout << quad->toString() << std::endl;
-			quad = quad->next;
-		}
+        generator.output(std::cout);
 	}
 	catch (const CompileError& error) {
 		std::cout << error.info << std::endl;

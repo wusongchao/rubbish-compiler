@@ -156,12 +156,21 @@ AstNode IRGenerator::visitWhile(WhileNode whileNode)
 
 AstNode IRGenerator::visitCall(CallNode call)
 {
-    for (const auto& param : call->param) {
-        visit(param);
+    // call param1, param2, ... , paramn
+    // generate code:
+    // paramn
+    // ...
+    // param1
+    // call
+    const auto& params = call->param;
+    for (auto it = params.rbegin(); it != params.rend(); ++it)
+    {
+        visit(*it);
 
         // get the argument by visit expressions(do the evaluation)
         auto arg{ operateStack.top() };
         operateStack.pop();
+
         emitParam(arg);
     }
 
@@ -172,12 +181,45 @@ AstNode IRGenerator::visitCall(CallNode call)
 
 AstNode IRGenerator::visitRead(ReadNode read)
 {
-    return AstNode();
+    // for read i1, i2, ..., in
+    // generate code:
+    // load in
+    // ...
+    // load i1
+    const auto& datas = read->datas;
+    for (auto it = datas.rbegin(); it != datas.rend(); ++it)
+    {
+        visit(*it);
+
+        // get the argument by visit expressions(do the evaluation)
+        auto arg{ operateStack.top() };
+        operateStack.pop();
+
+        emitRead(arg);
+    }
+
+    return read;
 }
 
 AstNode IRGenerator::visitWrite(WriteNode write)
 {
-    return AstNode();
+    // for write expr1, expr2, expr3...
+    // generate code:
+    // write i1,
+    // write i2,
+    // ...
+
+    // the difference comes from the object machine's stack structure
+    for (const auto& exp : write->datas) {
+        visit(exp);
+
+        auto arg{ operateStack.top() };
+        operateStack.pop();
+
+        emitWrite(arg);
+    }
+
+    return write;
 }
 
 AstNode IRGenerator::visitLogical(LogicalNode logical)
