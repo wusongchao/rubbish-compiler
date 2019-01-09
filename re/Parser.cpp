@@ -500,7 +500,7 @@ ProcNode Parser::proc()
 	match(CodeTokenType::Procedure);
 	CodeToken token = lookahead;
 	match(CodeTokenType::Id);
-	auto afunc = make_shared<FuncScripter>();
+	auto afunc = make_shared<FuncDescripter>();
 	afunc->id = make_shared<Id>(token, Type::Func, 0);
 	match(CodeTokenType::OpenParenthesis);
 	while (lookahead.tokenType == CodeTokenType::Id)

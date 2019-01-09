@@ -19,7 +19,7 @@ private:
     void emitLoad(VarNode id)
     {
         outputStream << "LOD" << ' '
-            << topEnv->getSymbolDepth(id->toString())
+            << topBlock->top->getSymbolDepth(id->toString())
             << ' , '
             << id->offset
             << endl;
@@ -37,7 +37,7 @@ private:
     void emitStore(VarNode id)
     {
         outputStream << "STO" << ' '
-            << topEnv->getSymbolDepth(id->toString())
+            << topBlock->top->getSymbolDepth(id->toString())
             << ' , '
             << id->offset
             << endl;
@@ -103,7 +103,7 @@ private:
 
     vector<QuadPtr> quads;
     vector<QuadPtr> labels;
-    shared_ptr<Env> topEnv;
+    BlockNode topBlock;
 
     ostream& outputStream;
 };
