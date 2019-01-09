@@ -38,6 +38,9 @@ BlockNode Parser::block()
     auto savedEnv{ top };
     top = make_shared<Env>(top);
 
+	auto saveFunvEnv{ funcTop };
+	funcTop = make_shared<FuncEnv>();
+
     auto savedConstEnv{ constTop };
     constTop = make_shared<ConstEnv>(constTop);
 
@@ -61,7 +64,8 @@ BlockNode Parser::block()
 
 	top = savedEnv;
 	constTop = savedConstEnv;
-	
+	funcTop = saveFunvEnv;
+
     return result;
 }
 
@@ -504,8 +508,6 @@ shared_ptr<Expr> Parser::factor()
 ProcNode Parser::proc()
 {
 	//<proc> ¡ú procedure <id>£¨[<id>{,<id>}]£©;<block>{;<proc>}
-	auto saveFEnc{ funcTop };
-	funcTop = make_shared<FuncEnv>(funcTop);
 
 	match(CodeTokenType::Procedure);
 	CodeToken token = lookahead;
@@ -527,7 +529,6 @@ ProcNode Parser::proc()
 
 	auto b = block();
 
-	funcTop = saveFEnc;
 	return make_shared<Proc>(afunc->id, b, funcTop);
 }
 
