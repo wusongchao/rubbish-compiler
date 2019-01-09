@@ -127,6 +127,7 @@
     <ClInclude Include="Logical.h" />
     <ClInclude Include="NFAConvertHelper.h" />
     <ClInclude Include="NFAModel.h" />
+    <ClInclude Include="ObjectCode.h" />
     <ClInclude Include="ObjectCodeGenerator.h" />
     <ClInclude Include="Op.h" />
     <ClInclude Include="Parser.h" />
@@ -153,6 +154,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NFAModel.cpp" />
     <ClCompile Include="NFAConvertHelper.cpp" />
+    <ClCompile Include="ObjectCode.cpp" />
     <ClCompile Include="ObjectCodeGenerator.cpp" />
     <ClCompile Include="Op.cpp" />
     <ClCompile Include="Parser.cpp" />
