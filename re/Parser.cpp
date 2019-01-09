@@ -39,7 +39,7 @@ BlockNode Parser::block()
     top = make_shared<Env>(top);
 
 	auto saveFunvEnv{ funcTop };
-	funcTop = make_shared<FuncEnv>();
+	funcTop = make_shared<FuncEnv>(funcTop);
 
     auto savedConstEnv{ constTop };
     constTop = make_shared<ConstEnv>(constTop);
