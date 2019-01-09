@@ -507,8 +507,6 @@ ProcNode Parser::proc()
 	auto saveFEnc{ funcTop };
 	funcTop = make_shared<FuncEnv>(funcTop);
 
-
-
 	match(CodeTokenType::Procedure);
 	CodeToken token = lookahead;
 	match(CodeTokenType::Id);
@@ -526,10 +524,10 @@ ProcNode Parser::proc()
 	match(CodeTokenType::Semicolon);
 
 	funcTop->putSymbol(token.value, afunc);
+
 	auto b = block();
 
 	funcTop = saveFEnc;
-
 	return make_shared<Proc>(afunc->id, b, funcTop);
 }
 
