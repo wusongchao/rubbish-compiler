@@ -13,10 +13,12 @@ shared_ptr<Program> Parser::program()
 // <program> ¡ú program <id>;<block>
 {
     match(CodeTokenType::Program);
+	CodeToken token = lookahead;
     match(CodeTokenType::Id);
     match(CodeTokenType::Semicolon);
+
 	auto blockRes = block();
-    return make_shared<Program>(blockRes->body,blockRes->pde);
+    return make_shared<Program>(token,blockRes);
 }
 
 Parser::Parser(Scanner & scanner)
@@ -50,15 +52,8 @@ BlockNode Parser::block()
 
 	auto result = make_shared<Block>(procRes, bodyRes,top, constTop);
 
-	if (savedConstEnv != nullptr)
-		constTop = savedConstEnv;
-	else 
-		top = savedEnv;
-
-	if (savedEnv != nullptr)
-		top = savedEnv;
-	else
-		constTop = savedConstEnv;
+	top = savedEnv;
+	constTop = savedConstEnv;
 	
     return result;
 }

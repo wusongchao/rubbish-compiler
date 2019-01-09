@@ -95,10 +95,15 @@ using BodyNode = shared_ptr<Body>;
 class Program : public Ast {
 public:
     virtual AstNode accept(AstVisitor& visitor) override;
-    BodyNode body;
-	ProcNode proc;
-    Program(BodyNode body);
-	Program(BodyNode body, ProcNode proc);
+ //   BodyNode body;
+	//ProcNode proc;
+ //   Program(BodyNode body);
+	//Program(BodyNode body, ProcNode proc);
+
+	CodeToken id;
+	BlockNode block;
+	Program(CodeToken id,BlockNode block);
+
 private:
 };
 

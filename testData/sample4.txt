@@ -1,0 +1,23 @@
+program main;
+const
+    cx := 1,
+    cy := 2,
+    cz := 4
+var
+    x,y,z
+begin
+    read(x,y,z);
+    x := cz+cx+5;
+    if x<10 then
+        y := cx*cy+x;
+        z := cy*y
+    else 
+        y := cx*cy+x+10;
+        z := cy*y+10
+    ;
+    while(z>y) do
+        x := z+2;
+        z := x-1
+    ;
+    write(x*y,y-z,z+x);
+end
