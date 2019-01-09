@@ -11,6 +11,10 @@ public:
 
     virtual AstNode visitProgram(ProgramNode program) = 0;
 
+    virtual AstNode visitBlock(BlockNode block) = 0;
+
+    virtual AstNode visitProcedure(ProcNode proc) = 0;
+
     virtual AstNode visitBody(BodyNode body) = 0;
 
     virtual AstNode visitAssign(AssignNode assign) = 0;

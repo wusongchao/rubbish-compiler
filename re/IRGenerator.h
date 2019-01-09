@@ -46,6 +46,10 @@ public:
 
     AstNode visitBody(BodyNode body) override;
 
+    AstNode visitBlock(BlockNode block) override;
+
+    AstNode visitProcedure(ProcNode proc) override;
+
     AstNode visitAssign(AssignNode assign) override;
 
     AstNode visitExpr(ExprNode expr) override;

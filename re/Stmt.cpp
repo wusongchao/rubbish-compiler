@@ -108,22 +108,22 @@ AstNode Body::accept(AstVisitor & visitor)
 
 AstNode Block::accept(AstVisitor & visitor)
 {
-	return AstNode();
+    return visitor.visitBlock(static_pointer_cast<Block>(shared_from_this()));
 }
 
 Block::Block(ProcNode p, BodyNode b, shared_ptr<Env> t, shared_ptr<ConstEnv> cT)
-	:pde(p), body(b),top(t),constTop(cT)
+	:proc(p), body(b),top(t),constTop(cT)
 {
 }
 
 Block::Block(ProcNode proc_, BodyNode body_)
-	:pde(proc_), body(body_)
+	:proc(proc_), body(body_)
 {
 }
 
 AstNode Proc::accept(AstVisitor & visitor)
 {
-	return AstNode();
+    return visitor.visitProcedure(static_pointer_cast<Proc>(shared_from_this()));
 }
 
 Proc::Proc(IdNode id_, BlockNode block_, std::vector<ProcNode> procs_)

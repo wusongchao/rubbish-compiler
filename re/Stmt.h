@@ -94,7 +94,7 @@ using BodyNode = shared_ptr<Body>;
 
 class Program : public Ast {
 public:
-    virtual AstNode accept(AstVisitor& visitor) override;
+    AstNode accept(AstVisitor& visitor) override;
  //   BodyNode body;
 	//ProcNode proc;
  //   Program(BodyNode body);
@@ -109,18 +109,18 @@ private:
 
 class Block : public Ast {
 public:
-	virtual AstNode accept(AstVisitor& visitor) override;
+	AstNode accept(AstVisitor& visitor) override;
 	Block(ProcNode p, BodyNode b, shared_ptr<Env> t, shared_ptr<ConstEnv> cT);
 	Block(ProcNode p, BodyNode b);
 	BodyNode body;
-	ProcNode pde;	//procedure
+	ProcNode proc;	//procedure
 	shared_ptr<Env> top;
 	shared_ptr<ConstEnv> constTop;
 };
 
 class Proc :public Ast {
 public:
-	virtual AstNode accept(AstVisitor& visitor) override;
+	AstNode accept(AstVisitor& visitor) override;
 	Proc(IdNode id_, BlockNode block_, std::vector<ProcNode> procs_);
 	IdNode id;
 	BlockNode block;

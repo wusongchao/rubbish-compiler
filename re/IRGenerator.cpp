@@ -52,7 +52,8 @@ AstNode IRGenerator::visitId(IdNode id)
 
 AstNode IRGenerator::visitProgram(shared_ptr<Program> program)
 {
-    return visitBody(program->block->body);
+    visitBlock(program->block);
+    return program;
 }
 
 AstNode IRGenerator::visitBody(BodyNode body)
@@ -61,6 +62,22 @@ AstNode IRGenerator::visitBody(BodyNode body)
         visit(stmt);
     }
     return body;
+}
+
+AstNode IRGenerator::visitBlock(BlockNode block)
+{
+    visit(block->proc);
+    visit(block->body);
+    return block;
+}
+
+AstNode IRGenerator::visitProcedure(ProcNode proc)
+{
+    visit(proc->block);
+    for (const auto p : proc->procs) {
+        visit(p);
+    }
+    return proc;
 }
 
 AstNode IRGenerator::visitAssign(AssignNode assign)
