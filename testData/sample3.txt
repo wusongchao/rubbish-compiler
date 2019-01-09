@@ -1,0 +1,31 @@
+program main;
+var
+    x,y
+    procedure p();
+    var
+        a
+        procedure q();
+        var
+            b
+        begin
+            b := 10;
+            write(b)
+        end;
+        procedure s();
+        var
+            c,d
+            procedure r();
+            var
+                e,f
+            begin
+                call q()
+            end
+        begin
+            call r()
+        end
+    begin
+        call s()
+    end
+begin
+    call p()
+end

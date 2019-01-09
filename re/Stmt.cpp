@@ -111,6 +111,11 @@ AstNode Block::accept(AstVisitor & visitor)
 	return AstNode();
 }
 
+Block::Block(ProcNode p, BodyNode b, shared_ptr<Env> t, shared_ptr<ConstEnv> cT)
+	:pde(p), body(b),top(t),constTop(cT)
+{
+}
+
 Block::Block(ProcNode proc_, BodyNode body_)
 	:pde(proc_), body(body_)
 {

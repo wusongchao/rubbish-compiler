@@ -3,8 +3,12 @@
 #include "Expr.h"
 class Proc;
 class Block;
+class Env;
+class ConstEnv;
 using ProcNode = shared_ptr<Proc>;
 using BlockNode = shared_ptr < Block>;
+
+
 class Stmt :
 	public Ast
 {
@@ -101,9 +105,12 @@ private:
 class Block : public Ast {
 public:
 	virtual AstNode accept(AstVisitor& visitor) override;
+	Block(ProcNode p, BodyNode b, shared_ptr<Env> t, shared_ptr<ConstEnv> cT);
 	Block(ProcNode p, BodyNode b);
 	BodyNode body;
 	ProcNode pde;	//procedure
+	shared_ptr<Env> top;
+	shared_ptr<ConstEnv> constTop;
 };
 
 class Proc :public Ast {

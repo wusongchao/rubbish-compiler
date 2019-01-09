@@ -87,7 +87,7 @@ void test1() {
 	Lexicon lexicon;
 	defineTokens(lexicon);
 
-	std::ifstream infile("Stmt.txt");
+	std::ifstream infile("../testData/sample3.txt");
 	if (!infile.is_open())
 	{
 		cout << "can`t open file testStmt.txt" << endl;
@@ -100,8 +100,22 @@ void test1() {
 	scanner.addSkipToken(CodeTokenType::Comment);
 
 	Parser parser(scanner);
-	parser.program();
+	try {
+		auto p = parser.program();
+		IRGenerator generator;
+		generator.visit(p);
+
+		auto quad = generator.getQuads()[0];
+		while (quad != nullptr) {
+			std::cout << quad->toString() << std::endl;
+			quad = quad->next;
+		}
+	}
+	catch (const CompileError& error) {
+		std::cout << error.info << std::endl;
+	}
 	infile.close();
+	cin.get();
 }
 
 void test2() {
@@ -161,7 +175,7 @@ void test2() {
 
 int main()
 {
-	//test1();
-	test2();
+	test1();
+	//test2();
     return 0;
 }

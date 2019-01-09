@@ -1,0 +1,30 @@
+program main;
+const
+    a := 2
+var
+    x
+    procedure p();
+        procedure p1();
+        const
+            a := 3
+        var
+            x
+            procedure p2();
+            const
+                a := 4
+            begin
+                write(x * a)
+            end
+        begin
+            x := 3;
+            write(x * a);
+            call p2()
+        end
+    begin
+        x := 2;
+        write(x * a);
+        call p1()
+    end
+begin
+    call p()
+end

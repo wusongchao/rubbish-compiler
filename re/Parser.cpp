@@ -48,10 +48,19 @@ BlockNode Parser::block()
 	}
     BodyNode bodyRes{ body() };
 
-    top = savedEnv;
-    constTop = savedConstEnv;
+	auto result = make_shared<Block>(procRes, bodyRes,top, constTop);
+
+	if (savedConstEnv != nullptr)
+		constTop = savedConstEnv;
+	else 
+		top = savedEnv;
+
+	if (savedEnv != nullptr)
+		top = savedEnv;
+	else
+		constTop = savedConstEnv;
 	
-    return make_shared<Block>(procRes,bodyRes);
+    return result;
 }
 
 void Parser::condecls()
