@@ -8,8 +8,8 @@ using std::to_string;
 
 namespace IR {
 
-Var::Var(int width, int offset):
-    width(width), offset(offset)
+Var::Var(VarTag tag, int width, int offset):
+    tag(tag), width(width), offset(offset)
 {
 }
 
@@ -19,7 +19,7 @@ string Var::toString()
 }
 
 Id::Id(IdNode node)
-    :Var(node->type.width, node->offset), name(node->token.value)
+    :Var(VarTag::Id, node->type.width, node->offset), name(node->token.value)
 {
 }
 
@@ -29,12 +29,12 @@ string Id::toString()
 }
 
 Temp::Temp(int number, const Type& type)
-    :Var(type.width), name('t' + to_string(number))
+    :Var(VarTag::Temp, type.width), name('t' + to_string(number))
 {
 }
 
 Temp::Temp(int number, int width)
-    :Var(width), name('t' + to_string(number))
+    :Var(VarTag::Temp, width), name('t' + to_string(number))
 {
 }
 
@@ -43,13 +43,13 @@ string Temp::toString()
     return name;
 }
 
-Constant::Constant(int width)
-    :Var(width)
+Constant::Constant(VarTag tag, int width)
+    :Var(tag, width)
 {
 }
 
 Integer::Integer(int value)
-    :Constant(4), value(value)
+    :Constant(VarTag::Integer, 4), value(value)
 {
 }
 
@@ -59,7 +59,7 @@ string Integer::toString()
 }
 
 Bool::Bool(bool value)
-    :Constant(1), value(value)
+    :Constant(VarTag::Bool, 1), value(value)
 {
 }
 
@@ -106,6 +106,8 @@ string opcodeToString(Opcode opcode)
             return "load";
         case Opcode::Store:
             return "store";
+        case Opcode::Read:
+            return "read";
         case Opcode::Write:
             return "write";
         case Opcode::Jlt:

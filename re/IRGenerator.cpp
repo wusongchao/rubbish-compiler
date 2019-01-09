@@ -428,7 +428,7 @@ AstNode IRGenerator::visitUnary(UnaryNode unary)
     auto temp{ createTemp(src->width) };
     switch (unary->token.tokenType) {
         case CodeTokenType::Sub:
-            emitUnary(Opcode::Add, src, temp);
+            emitUnary(Opcode::Neg, src, temp);
             break;
     }
     operateStack.push(temp);

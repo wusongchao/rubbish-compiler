@@ -198,7 +198,7 @@ private:
     }
 
     void emitRead(VarNode id) {
-        appendQuad(make_shared<Quad>(Opcode::Load, id));
+        appendQuad(make_shared<Quad>(Opcode::Read, id));
     }
 
     void emitWrite(VarNode exp) {

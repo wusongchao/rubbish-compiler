@@ -26,8 +26,9 @@ enum class Opcode {
     Not,
     Assign,
 
-    Load,     // similar to read
-    Store,     
+    Load,     
+    Store,    
+    Read,
     Write,
     Jlt,
     Jle,
@@ -46,12 +47,21 @@ enum class Opcode {
     Unknown
 };
 
+enum class VarTag {
+    Id,
+    Temp,
+    Constant,
+    Integer,
+    Bool,
+};
+
 class Var {
 public:
+    VarTag tag;
     int width;
     int offset = 0;
 
-    Var(int width, int offset = 0);
+    Var(VarTag tag, int width, int offset = 0);
     virtual string toString();
 };
 
@@ -76,7 +86,7 @@ public:
 
 class Constant : public Var {
 public:
-    Constant(int width);
+    Constant(VarTag tag, int width);
 };
 
 class Integer : public Constant {

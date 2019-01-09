@@ -74,6 +74,9 @@
     <ClCompile Include="Stmt.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ObjectCodeGenerator.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FixedMemoryPool.h">
@@ -143,6 +146,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Stmt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectCodeGenerator.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

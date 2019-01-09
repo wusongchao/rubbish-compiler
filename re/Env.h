@@ -8,6 +8,7 @@ using std::unordered_map;
 using std::unique_ptr;
 using std::shared_ptr;
 using std::string;
+using std::pair;
 
 class Env {
 public:
@@ -29,6 +30,22 @@ public:
         }
         
         return nullptr;
+    }
+
+    int getSymbolDepth(const string& str) {
+        int depth = 0;
+        Env* cur = this;
+        while (cur != nullptr) {
+            auto endIter = cur->table.end();
+            auto it = cur->table.find(str);
+            if (it != endIter) {
+                return depth;
+            }
+            cur = cur->prev.get();
+            ++depth;
+        }
+
+        return -1;
     }
 
 private:
