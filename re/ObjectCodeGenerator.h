@@ -18,18 +18,19 @@ public:
 private:
     void emitLoad(VarNode id)
     {
+        auto s = id->toString();
         outputStream << "LOD" << ' '
             << topBlock->top->getSymbolDepth(id->toString())
-            << ' , '
+            << " , "
             << id->offset
             << endl;
     }
 
     void emitLit(VarNode constant)
     {
-        outputStream << 'LIT' << ' '
+        outputStream << "LIT" << ' '
             << '0'
-            << ' , '
+            << " , "
             << constant->toString()
             << endl;
     }
@@ -38,7 +39,7 @@ private:
     {
         outputStream << "STO" << ' '
             << topBlock->top->getSymbolDepth(id->toString())
-            << ' , '
+            << " , "
             << id->offset
             << endl;
     }
@@ -47,7 +48,7 @@ private:
     {
         outputStream << "OPR" << ' '
             << '0'
-            << ' , '
+            << " , "
             << opcodeToString(op)
             << endl;
     }
@@ -56,7 +57,7 @@ private:
     {
         outputStream << "RED" << ' '
             << topBlock->top->getSymbolDepth(id->toString())
-            << ' , '
+            << " , "
             << id->offset
             << endl;
     }
@@ -78,7 +79,7 @@ private:
     {
         outputStream << toUpper(opcodeToString(op)) << ' '
             << '0'
-            << ' , '
+            << " , "
             << target
             << endl;
     }
@@ -87,7 +88,7 @@ private:
     {
         outputStream << "CAL" << ' '
             << '0'
-            << ' , '
+            << " , "
             << func->toString()
             << endl;
     }
@@ -96,9 +97,11 @@ private:
     void processOperand(VarNode operand) {
         switch (operand->tag) {
             case VarTag::Id:
+                ++offset;
                 emitLoad(operand);
                 break;
             case VarTag::Integer:
+                ++offset;
                 emitLit(operand);
                 break;
         }
@@ -107,9 +110,12 @@ private:
     void processDest(VarNode dest) {
         switch (dest->tag) {
             case VarTag::Id:
+                ++offset;
                 emitStore(dest);
         }
     }
+
+    void 
 
     void translateIR(QuadPtr quad);
 
@@ -133,9 +139,13 @@ private:
 
     void translateAssign(QuadPtr assign);
 
+    void translateLabel(QuadPtr label);
+
     vector<QuadPtr> quads;
     vector<QuadPtr> labels;
     BlockNode topBlock;
 
     ostream& outputStream;
+
+    int offset = 0;
 };

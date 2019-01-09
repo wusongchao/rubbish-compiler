@@ -6,6 +6,7 @@
 #include "Scanner.h"
 #include "Parser.h"
 #include "IRGenerator.h"
+#include "ObjectCodeGenerator.h"
 #include <fstream>
 
 using std::cin;
@@ -87,7 +88,7 @@ void test1() {
 	Lexicon lexicon;
 	defineTokens(lexicon);
 
-	std::ifstream infile("../testData/controlFlow.txt");
+	std::ifstream infile("../testData/sample2.txt");
 	if (!infile.is_open())
 	{
 		cout << "can`t open data file" << endl;
@@ -105,11 +106,9 @@ void test1() {
 		IRGenerator generator;
 		generator.visit(p);
 
-		auto quad = generator.getQuads()[0];
-		while (quad != nullptr) {
-			std::cout << quad->toString() << std::endl;
-			quad = quad->next;
-		}
+        generator.output(std::cout);
+        ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), generator.getLabels(), p->block, std::cout);
+        //objectCodeGenerator.generate();
 	}
 	catch (const CompileError& error) {
 		std::cout << error.info << std::endl;
@@ -161,7 +160,10 @@ void test2() {
 		IRGenerator generator;
 		generator.visit(p);
 
-        generator.output(std::cout);
+        //generator.output(std::cout);
+
+        ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), generator.getLabels(), p->block, std::cout);
+        objectCodeGenerator.generate();
 	}
 	catch (const CompileError& error) {
 		std::cout << error.info << std::endl;
