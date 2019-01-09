@@ -488,7 +488,7 @@ shared_ptr<Expr> Parser::factor()
         case CodeTokenType::OpenParenthesis:
         {
             match(CodeTokenType::OpenParenthesis);
-            auto res{ expr() };
+            auto res{ boolExpr() };
             match(CodeTokenType::CloseParenthesis);
             return res;
         }
@@ -604,6 +604,10 @@ shared_ptr<Constant> Parser::foldConstant(const CodeToken& opToken, ExprNode lhs
             return Constant::createBool(stoi(lhs->token.value) > stoi(rhs->token.value));
         case CodeTokenType::GE:
             return Constant::createBool(stoi(lhs->token.value) >= stoi(rhs->token.value));
+        case CodeTokenType::EQ:
+            return Constant::createBool(stoi(lhs->token.value) == stoi(rhs->token.value));
+        case CodeTokenType::NE:
+            return Constant::createBool(stoi(lhs->token.value) != stoi(rhs->token.value));
         case CodeTokenType::Add:
             return Constant::createInteger(stoi(lhs->token.value) + stoi(rhs->token.value));
         case CodeTokenType::Sub:

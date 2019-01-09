@@ -96,14 +96,18 @@ string opcodeToString(Opcode opcode)
             return "==";
         case Opcode::NE:
             return "!=";
+        case Opcode::Odd:
+            return "odd";
         case Opcode::Not:
             return "!";
         case Opcode::Assign:
             return "=";
         case Opcode::Load:
-            return "";
+            return "load";
         case Opcode::Store:
-            return "";
+            return "store";
+        case Opcode::Write:
+            return "write";
         case Opcode::Jlt:
             return "j<";
         case Opcode::Jle:
@@ -120,6 +124,10 @@ string opcodeToString(Opcode opcode)
             return "jtrue";
         case Opcode::Jf:
             return "jfalse";
+        case Opcode::Jodd:
+            return "Jodd";
+        case Opcode::Jnodd:
+            return "Jnodd";
         case Opcode::Jmp:
             return "jmp";
         case Opcode::Param:

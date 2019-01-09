@@ -19,6 +19,7 @@ enum class Opcode {
     GE,
     EQ,
     NE,
+    Odd,
 
     // Unary operator
     Neg,
@@ -26,7 +27,8 @@ enum class Opcode {
     Assign,
 
     Load,     // similar to read
-    Store,     // similar to write
+    Store,     
+    Write,
     Jlt,
     Jle,
     Jgt,
@@ -35,6 +37,8 @@ enum class Opcode {
     Jne,
     Jt,    // jump if true 
     Jf,    // jump if false
+    Jodd,    // jump if odd src1
+    Jnodd,    // jump if not odd
     Jmp,
     Param,
     Call,
