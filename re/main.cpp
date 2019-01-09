@@ -107,7 +107,7 @@ void test1() {
 		generator.visit(p);
 
         generator.output(std::cout);
-        ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), generator.getLabels(), p->block, std::cout);
+        ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), p->block, std::cout);
         //objectCodeGenerator.generate();
 	}
 	catch (const CompileError& error) {
@@ -162,7 +162,7 @@ void test2() {
 
         //generator.output(std::cout);
 
-        ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), generator.getLabels(), p->block, std::cout);
+        ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), p->block, std::cout);
         objectCodeGenerator.generate();
 	}
 	catch (const CompileError& error) {

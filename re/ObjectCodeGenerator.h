@@ -1,20 +1,27 @@
 #pragma once
 #include "Env.h"
 #include "IRGenerator.h"
+#include "ObjectCode.h"
 #include "UtilMethods.h"
 
 using std::endl;
 using IR::opcodeToString;
 using IR::VarTag;
+using CodePtr = shared_ptr<ObjectCode::ObjectCode>;
+using std::pair;
 
 class ObjectCodeGenerator {
 public:
     void generate();
 
+    void output(ostream& stream) {
+        for (const auto& code : objectCodes) {
+            stream << code->toString() << endl;
+        }
+    }
+
     ObjectCodeGenerator(const vector<QuadPtr>& quads,
-        const vector<QuadPtr>& labels,
-        BlockNode topBlock,
-        ostream& outputStream);
+        BlockNode topBlock);
 private:
     void emitLoad(VarNode id)
     {
@@ -24,6 +31,7 @@ private:
             << " , "
             << id->offset
             << endl;
+        objectCodes.push_back(make_shared<>());
     }
 
     void emitLit(VarNode constant)
@@ -75,13 +83,15 @@ private:
     }
 
     // JPC and JMP
-    void emitJmp(Opcode op, int target)
+    void emitJmp(Opcode op, int labelNumber)
     {
         outputStream << toUpper(opcodeToString(op)) << ' '
             << '0'
             << " , "
-            << target
+            << labelNumber
             << endl;
+        beReferencedLabels[labelNumber].second.push_back(jmpCodes.size());
+        // insert the object code
     }
 
     void emitCall(VarNode func)
@@ -97,11 +107,9 @@ private:
     void processOperand(VarNode operand) {
         switch (operand->tag) {
             case VarTag::Id:
-                ++offset;
                 emitLoad(operand);
                 break;
             case VarTag::Integer:
-                ++offset;
                 emitLit(operand);
                 break;
         }
@@ -110,12 +118,11 @@ private:
     void processDest(VarNode dest) {
         switch (dest->tag) {
             case VarTag::Id:
-                ++offset;
                 emitStore(dest);
         }
     }
 
-    void 
+    void backpatchJmps();
 
     void translateIR(QuadPtr quad);
 
@@ -142,10 +149,9 @@ private:
     void translateLabel(QuadPtr label);
 
     vector<QuadPtr> quads;
-    vector<QuadPtr> labels;
+    //vector<QuadPtr> labels;
+    unordered_map<int, pair<int, vector<int>>> beReferencedLabels;
     BlockNode topBlock;
-
-    ostream& outputStream;
-
-    int offset = 0;
+    vector<CodePtr> objectCodes;
+    vector<CodePtr> jmpCodes;
 };
