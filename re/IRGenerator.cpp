@@ -52,7 +52,7 @@ AstNode IRGenerator::visitId(IdNode id)
 
 AstNode IRGenerator::visitProgram(shared_ptr<Program> program)
 {
-    return visitBody(program->body);
+    return visitBody(program->block->body);
 }
 
 AstNode IRGenerator::visitBody(BodyNode body)
