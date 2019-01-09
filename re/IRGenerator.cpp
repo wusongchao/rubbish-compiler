@@ -12,14 +12,23 @@ AstNode IRGenerator::visitConstant(ConstantNode expr)
 {
     switch (expr->type.tag) {
         case TypeTag::Bool:
+            // B -> true  B.code = gen("goto" B.true)
+            // B -> false  B.code = gen("goto" B.false) 
             if (expr->token.value == "true") {
-                operateStack.push(make_shared<IR::Bool>(true));
+                int trueLabel = labelStack.top();
+                labelStack.pop();
+                emitJmp(trueLabel);
+                //operateStack.push(make_shared<IR::Bool>(true));
             } else {
-                operateStack.push(make_shared<IR::Bool>(false));
+                int falseLabel = labelStack.top();
+                labelStack.pop();
+                emitJmp(falseLabel);
+                //operateStack.push(make_shared<IR::Bool>(false));
             }
             break;
         case TypeTag::Int:
             operateStack.push(make_shared<IR::Integer>(stoi(expr->token.value)));
+            break;
     }
 
     return expr;
@@ -66,32 +75,41 @@ AstNode IRGenerator::visitIf(IfNode ifNode)
     //int ifLabel = emitLabel();
     // logical expression
     if (ifNode->falseStmt != nullptr) {
+        int trueLabel = Fall;
         int elseLabel = emitLabel();
         int endLabel = emitLabel();
 
+        // B.true = fall
+        // B.false = newLabel()
+        labelStack.push(trueLabel);
+        labelStack.push(elseLabel);
+        // generate B.code
         visit(ifNode->cond);
-        auto cond{ logicalStack.top() };
-        logicalStack.pop();
-        
-        // if lexp false, goto else block
-        emitConditionJmp(getOppositeConditonJmp(cond->op), cond->src1, cond->src2, elseLabel);
-
+       
+        // generate S1.code
         visit(ifNode->trueStmt);
 
+        // goto S.next(endLabel)
         emitJmp(endLabel);
 
+        // label(B.false) elseLabel
         markLabel(elseLabel);
+        // generate S2.code
         visit(ifNode->falseStmt);
         markLabel(endLabel);
     } else {
+        int trueLabel = Fall;
         int endLabel = emitLabel();
 
+        // B.true = fall
+        // B.false = S.next(endLabel)
+        labelStack.push(trueLabel);
+        labelStack.push(endLabel);
+        // generate B.code
         visit(ifNode->cond);
-        auto cond{ logicalStack.top() };
-        logicalStack.pop();
 
-        emitConditionJmp(getOppositeConditonJmp(cond->op), cond->src1, cond->src2, endLabel);
-
+        // generate S1.code
+        // see the "dragon book" p261
         visit(ifNode->trueStmt);
 
         markLabel(endLabel);
@@ -161,32 +179,39 @@ AstNode IRGenerator::visitRel(RelNode rel)
     visit(rel->expr1);
     visit(rel->expr2);
 
-    auto src1{ operateStack.top() };
-    operateStack.pop();
+    // src1 was pushed into the stack first
     auto src2{ operateStack.top() };
     operateStack.pop();
+    auto src1{ operateStack.top() };
+    operateStack.pop();
 
-    switch (rel->token.tokenType) {
-        case CodeTokenType::LT:
-            emitLogical(Opcode::LT, src1, src2);
-            break;
-        case CodeTokenType::LE:
-            emitLogical(Opcode::LE, src1, src2);
-            break;
-        case CodeTokenType::GT:
-            emitLogical(Opcode::GT, src1, src2);
-            break;
-        case CodeTokenType::GE:
-            emitLogical(Opcode::GE, src1, src2);
-            break;
-        case CodeTokenType::EQ:
-            emitLogical(Opcode::EQ, src1, src2);
-            break;
-        case CodeTokenType::NE:
-            emitLogical(Opcode::NE, src1, src2);
-            break;
+    // the same rule as below
+    // since B.true was pushed into the stack first
+    int falseLabel = labelStack.top();
+    labelStack.pop();
+    int trueLabel = labelStack.top();
+    labelStack.pop();
+
+    //if (B.true != fall and B.false != fall){
+    //    gen(if test goto B.true) || gen(goto B.false)
+    //} else if (B.true != fall) {
+    //    gen(if test goto B.true)
+    //} else if (B.false != fall) {
+    //    gen(iffalse test goto B.false)
+    //}
+
+    CodeTokenType opTokenType = rel->token.tokenType;
+    Opcode relOp = getOpcode(opTokenType);
+
+    if (trueLabel != Fall && falseLabel != Fall) {
+        emitConditionJmp(relOp, src1, src2, trueLabel);
+        emitJmp(falseLabel);
+    } else if (trueLabel != Fall) {
+        emitConditionJmp(relOp, src1, src2, trueLabel);
+    } else if (falseLabel != Fall) {
+        emitConditionJmp(getOppositeConditonJmpOpcode(relOp), src1, src2, falseLabel);
     }
-    // will not create temp variable
+
     return rel;
 }
 
@@ -195,10 +220,12 @@ AstNode IRGenerator::visitArith(ArithNode arith)
     visit(arith->expr1);
     visit(arith->expr2);
 
-    auto src1{ operateStack.top() };
-    operateStack.pop();
     auto src2{ operateStack.top() };
     operateStack.pop();
+    auto src1{ operateStack.top() };
+    operateStack.pop();
+
+    // similar to visitArith(visit(expr1), visit(expr2))
 
     auto temp{ createTemp(src1->width) };
     switch (arith->token.tokenType) {

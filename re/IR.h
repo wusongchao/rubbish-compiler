@@ -38,7 +38,8 @@ enum class Opcode {
     Jmp,
     Param,
     Call,
-    Label
+    Label,
+    Unknown
 };
 
 class Var {

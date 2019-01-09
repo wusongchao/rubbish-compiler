@@ -92,6 +92,24 @@ private:
         //quads.emplace_back(op, src1, src2, dest);
     }
 
+    Opcode getOpcode(CodeTokenType opTokenType) {
+        switch (opTokenType) {
+            case CodeTokenType::LT:
+                return Opcode::LT;
+            case CodeTokenType::LE:
+                return Opcode::LE;
+            case CodeTokenType::GT:
+                return Opcode::GT;
+            case CodeTokenType::GE:
+                return Opcode::GE;
+            case CodeTokenType::EQ:
+                return Opcode::EQ;
+            case CodeTokenType::NE:
+                return Opcode::NE;
+        }
+        return Opcode::Unknown;
+    }
+
     void emitConditionJmp(Opcode op, VarNode src1, VarNode src2, int dest) {
         auto destLabel{ make_shared<IR::Integer>(dest) };
         emitConditionJmp(op, src1, src2, destLabel);
@@ -115,12 +133,12 @@ private:
     }
 
     // will not push logical ir to quads
-    void emitLogical(Opcode op, VarNode src1, VarNode src2) {
-        auto logical{ make_shared<Quad>(op) };
-        logical->src1 = src1;
-        logical->src2 = src2;
-        logicalStack.push(logical);
-    }
+    //void emitLogical(Opcode op, VarNode src1, VarNode src2) {
+    //    auto logical{ make_shared<Quad>(op) };
+    //    logical->src1 = src1;
+    //    logical->src2 = src2;
+    //    logicalStack.push(logical);
+    //}
 
     void emitUnary(Opcode op, VarNode src, VarNode dest) {
         appendQuad(make_shared<Quad>(op, src, dest));
@@ -160,7 +178,7 @@ private:
         // skip one quad: the label quad
     }
 
-    Opcode getOppositeConditonJmp(Opcode op) {
+    Opcode getOppositeConditonJmpOpcode(Opcode op) {
         switch (op)
         {
             case Opcode::LT:
@@ -184,7 +202,6 @@ private:
     vector<QuadPtr> labels;
     stack<VarNode> operateStack;
     // see the comment in visitRel, visitIf
-    stack<QuadPtr> logicalStack;
 
     // for convenience, this is used to pass property true, false
     // to logical expression's translation process
