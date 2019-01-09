@@ -12,23 +12,33 @@ AstNode IRGenerator::visitConstant(ConstantNode expr)
 {
     switch (expr->type.tag) {
         case TypeTag::Bool:
+        {
             // B -> true  B.code = gen("goto" B.true)
             // B -> false  B.code = gen("goto" B.false) 
+            int falseLabel = labelStack.top();
+            labelStack.pop();
+            int trueLabel = labelStack.top();
+            labelStack.pop();
+
             if (expr->token.value == "true") {
-                int trueLabel = labelStack.top();
-                labelStack.pop();
-                emitJmp(trueLabel);
+                if (trueLabel != Fall) {
+                    emitJmp(trueLabel);
+                }
+                
                 //operateStack.push(make_shared<IR::Bool>(true));
             } else {
-                int falseLabel = labelStack.top();
-                labelStack.pop();
-                emitJmp(falseLabel);
+                if (falseLabel != Fall) {
+                    emitJmp(falseLabel);
+                }
                 //operateStack.push(make_shared<IR::Bool>(false));
             }
             break;
+        }
         case TypeTag::Int:
+        {
             operateStack.push(make_shared<IR::Integer>(stoi(expr->token.value)));
             break;
+        }
     }
 
     return expr;
@@ -120,7 +130,28 @@ AstNode IRGenerator::visitIf(IfNode ifNode)
 
 AstNode IRGenerator::visitWhile(WhileNode whileNode)
 {
-    return AstNode();
+    int beginLabel = emitLabel();
+    int trueLabel = Fall;
+    int endLabel = emitLabel();
+    
+    // label(B.true)
+    markLabel(beginLabel);
+    // B.true = fall
+    // B.false = S.next(endLabel)
+    labelStack.push(trueLabel);
+    labelStack.push(endLabel);
+    // B.code
+    visit(whileNode->cond);
+
+    // S.code
+    visit(whileNode->stmt);
+
+    // gen(goto begin)
+    emitJmp(beginLabel);
+
+    markLabel(endLabel);
+
+    return whileNode;
 }
 
 AstNode IRGenerator::visitCall(CallNode call)
@@ -156,22 +187,117 @@ AstNode IRGenerator::visitLogical(LogicalNode logical)
 
 AstNode IRGenerator::visitOr(OrNode orNode)
 {
-    return AstNode();
+    // also see the "dragon book" p261
+    // for more information about the sequence, 
+    // see visitRel's comment
+    // inherited attributes B.true, B.false
+    int parentFalse = labelStack.top();
+    labelStack.pop();
+    int parentTrue = labelStack.top();
+    labelStack.pop();
+
+    // if fall
+    // pass the expr2
+    int expr1True = parentTrue == Fall ? emitLabel() : parentTrue;
+    int expr1False = Fall;
+    int expr2True = parentTrue;
+    int expr2False = parentFalse;
+    
+    // B1.code || B2.code
+    labelStack.push(expr1True);
+    labelStack.push(expr1False);
+    visit(orNode->expr1);
+    labelStack.push(expr2True);
+    labelStack.push(expr2False);
+    visit(orNode->expr2);
+    // if B.true == fall
+    if (parentTrue == Fall) {
+        markLabel(expr1True);
+    }
+
+    return orNode;
 }
 
 AstNode IRGenerator::visitAnd(AndNode andNode)
 {
-    return AstNode();
+    // also see the "dragon book" p261
+    // for more information about the sequence, 
+    // see visitRel's comment
+    // inherited attributes B.true, B.false
+    int parentFalse = labelStack.top();
+    labelStack.pop();
+    int parentTrue = labelStack.top();
+    labelStack.pop();
+
+    // B -> B1 && B2
+    // B1.true = fall(must visit b2 cond)
+    // B1.false must pass B2.code
+    // B1.false = B.false == Fall? emitLabel() : B.false
+    // B2.true = B1.true
+    // B2.false = B.false
+    int expr1True = Fall;
+    int expr1False = parentFalse == Fall? emitLabel() : parentFalse;
+    int expr2True = parentTrue;
+    int expr2False = parentFalse;
+
+    // B1.code || B2.code
+    labelStack.push(expr1True);
+    labelStack.push(expr1False);
+    visit(andNode->expr1);
+    labelStack.push(expr2True);
+    labelStack.push(expr2False);
+    visit(andNode->expr2);
+    // if B.false == fall
+    if (parentFalse == Fall) {
+        markLabel(expr1False);
+    }
+
+    return andNode;
 }
 
 AstNode IRGenerator::visitNot(NotNode notNode)
 {
-    return AstNode();
+    int falseLabel = labelStack.top();
+    labelStack.pop();
+    int trueLabel = labelStack.top();
+    labelStack.pop();
+
+    // B1.true = B.false
+    // B1.false = B.true
+    labelStack.push(falseLabel);
+    labelStack.push(trueLabel);
+    visit(notNode->expr1);
+
+    return notNode;
 }
 
 AstNode IRGenerator::visitOdd(OddNode oddNode)
 {
-    return AstNode();
+    // B -> odd E
+    // similar rule as rel
+    visit(oddNode->expr1);
+
+    auto src{ operateStack.top() };
+    operateStack.pop();
+
+    int falseLabel = labelStack.top();
+    labelStack.pop();
+    int trueLabel = labelStack.top();
+    labelStack.pop();
+
+    CodeTokenType opTokenType = oddNode->token.tokenType;
+    Opcode jmpRelOp = getJmpOpcode(opTokenType);
+
+    if (trueLabel != Fall && falseLabel != Fall) {
+        emitOddJmp(jmpRelOp, src, trueLabel);
+        emitJmp(falseLabel);
+    } else if (trueLabel != Fall) {
+        emitOddJmp(jmpRelOp, src, trueLabel);
+    } else if (falseLabel != Fall) {
+        emitOddJmp(getOppositeConditonJmpOpcode(jmpRelOp), src, falseLabel);
+    }
+
+    return oddNode;
 }
 
 AstNode IRGenerator::visitRel(RelNode rel)
@@ -201,15 +327,15 @@ AstNode IRGenerator::visitRel(RelNode rel)
     //}
 
     CodeTokenType opTokenType = rel->token.tokenType;
-    Opcode relOp = getOpcode(opTokenType);
+    Opcode jmpRelOp = getJmpOpcode(opTokenType);
 
     if (trueLabel != Fall && falseLabel != Fall) {
-        emitConditionJmp(relOp, src1, src2, trueLabel);
+        emitConditionJmp(jmpRelOp, src1, src2, trueLabel);
         emitJmp(falseLabel);
     } else if (trueLabel != Fall) {
-        emitConditionJmp(relOp, src1, src2, trueLabel);
+        emitConditionJmp(jmpRelOp, src1, src2, trueLabel);
     } else if (falseLabel != Fall) {
-        emitConditionJmp(getOppositeConditonJmpOpcode(relOp), src1, src2, falseLabel);
+        emitConditionJmp(getOppositeConditonJmpOpcode(jmpRelOp), src1, src2, falseLabel);
     }
 
     return rel;

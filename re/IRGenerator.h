@@ -106,6 +106,28 @@ private:
                 return Opcode::EQ;
             case CodeTokenType::NE:
                 return Opcode::NE;
+            case CodeTokenType::Odd:
+                return Opcode::Odd;
+        }
+        return Opcode::Unknown;
+    }
+
+    Opcode getJmpOpcode(CodeTokenType opTokenType) {
+        switch (opTokenType) {
+            case CodeTokenType::LT:
+                return Opcode::Jlt;
+            case CodeTokenType::LE:
+                return Opcode::Jle;
+            case CodeTokenType::GT:
+                return Opcode::Jgt;
+            case CodeTokenType::GE:
+                return Opcode::Jge;
+            case CodeTokenType::EQ:
+                return Opcode::Jeq;
+            case CodeTokenType::NE:
+                return Opcode::Jne;
+            case CodeTokenType::Odd:
+                return Opcode::Jodd;
         }
         return Opcode::Unknown;
     }
@@ -125,6 +147,15 @@ private:
     void emitJmp(int label) {
         auto dest{ make_shared<IR::Integer>(label) };
         emitJmp(dest);
+    }
+
+    void emitOddJmp(Opcode op, VarNode src, VarNode dest) {
+        appendQuad(make_shared<Quad>(op, src, dest));
+    }
+
+    void emitOddJmp(Opcode op, VarNode src, int label) {
+        auto dest{ make_shared<IR::Integer>(label) };
+        emitOddJmp(op, src, dest);
     }
 
     void emitArith(Opcode op, VarNode src1, VarNode src2, VarNode dest) {
@@ -182,17 +213,28 @@ private:
         switch (op)
         {
             case Opcode::LT:
+            case Opcode::Jlt:
                 return Opcode::Jge;
             case Opcode::LE:
+            case Opcode::Jle:
                 return Opcode::Jgt;
             case Opcode::GT:
+            case Opcode::Jgt:
                 return Opcode::Jle;
             case Opcode::GE:
+            case Opcode::Jge:
                 return Opcode::Jlt;
             case Opcode::EQ:
+            case Opcode::Jeq:
                 return Opcode::Jne;
             case Opcode::NE:
+            case Opcode::Jne:
                 return Opcode::Jeq;
+            case Opcode::Odd:
+            case Opcode::Jodd:
+                return Opcode::Jnodd;
+            case Opcode::Jnodd:
+                return Opcode::Jodd;
         }
         return Opcode::Jmp;
     }

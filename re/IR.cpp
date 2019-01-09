@@ -96,6 +96,8 @@ string opcodeToString(Opcode opcode)
             return "==";
         case Opcode::NE:
             return "!=";
+        case Opcode::Odd:
+            return "odd";
         case Opcode::Not:
             return "!";
         case Opcode::Assign:
@@ -120,6 +122,10 @@ string opcodeToString(Opcode opcode)
             return "jtrue";
         case Opcode::Jf:
             return "jfalse";
+        case Opcode::Jodd:
+            return "Jodd";
+        case Opcode::Jnodd:
+            return "Jnodd";
         case Opcode::Jmp:
             return "jmp";
         case Opcode::Param:

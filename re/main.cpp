@@ -119,14 +119,14 @@ void test2() {
     //);
     istringstream stringStream(
         "program fuck;\n"
-        "const i := 1\n"
+        "const i := 2\n"
         "var a, b\n"
         "begin\n"
-        "if a = 2 then\n"
-        "a := 1 + 2 + b\n"
-        "else\n"
-        "a := a + b\n"
-        //"b := a + 3 - (5 * a) * 5\n"
+        "while (odd a && b = 2) do\n"
+        "a := 1 + 2 + b;\n"
+        //"else\n"
+        //"a := a + b\n"
+        "b := a + 3 - (5 * a) * 5\n"
         "end"
     );
     //istringstream stringStream(
