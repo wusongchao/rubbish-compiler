@@ -111,13 +111,13 @@ AstNode Block::accept(AstVisitor & visitor)
     return visitor.visitBlock(static_pointer_cast<Block>(shared_from_this()));
 }
 
-Block::Block(ProcNode p, BodyNode b, shared_ptr<Env> t, shared_ptr<ConstEnv> cT)
-	:proc(p), body(b),top(t),constTop(cT)
+Block::Block(vector<ProcNode> p, BodyNode b, shared_ptr<Env> t, shared_ptr<ConstEnv> cT)
+	:procs(p), body(b),top(t),constTop(cT)
 {
 }
 
-Block::Block(ProcNode proc_, BodyNode body_)
-	:proc(proc_), body(body_)
+Block::Block(vector<ProcNode> procs, BodyNode body)
+	:procs(procs), body(body)
 {
 }
 
@@ -126,7 +126,17 @@ AstNode Proc::accept(AstVisitor & visitor)
     return visitor.visitProcedure(static_pointer_cast<Proc>(shared_from_this()));
 }
 
-Proc::Proc(IdNode id_, BlockNode block_, std::vector<ProcNode> procs_)
-	:id(id_), block(block_), procs(procs_)
+Proc::Proc(IdNode id_, BlockNode block_, shared_ptr<FuncEnv> preFunc)
+	:id(id_), block(block_),preFunc(preFunc)
 {
+}
+
+Proc::Proc(IdNode id_, BlockNode block_)
+	:id(id_), block(block_)
+{
+}
+
+void Proc::setPreFunc(shared_ptr<FuncEnv> preFunc)
+{
+	this->preFunc = preFunc;
 }

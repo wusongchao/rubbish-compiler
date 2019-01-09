@@ -97,9 +97,8 @@ public:
 
 class FuncEnv{
 public:
-	FuncEnv() {
-		table = unordered_map<string, shared_ptr<FuncDescripter>>();
-	};
+	FuncEnv(shared_ptr<FuncEnv> prev);
+
 	void putSymbol(const CodeToken& token, shared_ptr<FuncDescripter> funcscrip) {
 		table.insert({ token.value, funcscrip });
 	}
@@ -107,14 +106,19 @@ public:
 		table.insert({ name, funcscrip });
 	}
 	shared_ptr<FuncDescripter> getSymbol(const CodeToken& token) {
-		auto endIter = table.end();
-		auto it = table.find(token.value);
-		if (it != endIter) {
-			return it->second;
+		auto cur = this;
+		while (cur != nullptr) {
+			auto endIter = cur->table.end();
+			auto it = cur->table.find(token.value);
+			if (it != endIter) {
+				return it->second;
+			}
+			cur = cur->prev.get();
 		}
-		return nullptr;
 	}
 
 private:
+	shared_ptr<FuncEnv> prev{ nullptr };
+
 	unordered_map<string, shared_ptr<FuncDescripter>> table;
 };

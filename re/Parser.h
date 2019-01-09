@@ -79,7 +79,6 @@ private:
     CodeToken lookahead;
     shared_ptr<Env> top{ nullptr };
     shared_ptr<ConstEnv> constTop{ nullptr };
-	shared_ptr<FuncEnv> funcTop = std::make_shared<FuncEnv>();
-
+	shared_ptr<FuncEnv> funcTop{ nullptr };
     int usedOffset = 0;
 };

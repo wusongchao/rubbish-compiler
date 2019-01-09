@@ -34,8 +34,8 @@ BlockNode Parser::block()
     // we can ensure that in the lifetime of this procedure
     // top will not be destructed
     // so the reference to savedEnv is valid
+	// add a local handler for old top
     auto savedEnv{ top };
-    // add a local handler for old top
     top = make_shared<Env>(top);
 
     auto savedConstEnv{ constTop };
@@ -44,13 +44,20 @@ BlockNode Parser::block()
     condecls();
     vardecls();
 
-	ProcNode procRes;
+	auto procs = vector<ProcNode>();
 	if (lookahead.tokenType == CodeTokenType::Procedure) {
-		procRes = proc();
+		procs.push_back(proc());
+		CodeToken token = lookahead;
+		while (token.tokenType==CodeTokenType::Semicolon)
+		{
+			match(CodeTokenType::Semicolon);	
+			procs.push_back(proc());
+			token = lookahead;
+		}
 	}
     BodyNode bodyRes{ body() };
 
-	auto result = make_shared<Block>(procRes, bodyRes,top, constTop);
+	auto result = make_shared<Block>(procs, bodyRes,top, constTop);
 
 	top = savedEnv;
 	constTop = savedConstEnv;
@@ -497,6 +504,11 @@ shared_ptr<Expr> Parser::factor()
 ProcNode Parser::proc()
 {
 	//<proc> ¡ú procedure <id>£¨[<id>{,<id>}]£©;<block>{;<proc>}
+	auto saveFEnc{ funcTop };
+	funcTop = make_shared<FuncEnv>(funcTop);
+
+
+
 	match(CodeTokenType::Procedure);
 	CodeToken token = lookahead;
 	match(CodeTokenType::Id);
@@ -511,15 +523,14 @@ ProcNode Parser::proc()
 		}
 	}
 	match(CodeTokenType::CloseParenthesis);
-	funcTop->putSymbol(token.value, afunc);
 	match(CodeTokenType::Semicolon);
+
+	funcTop->putSymbol(token.value, afunc);
 	auto b = block();
-	auto procs = std::vector<ProcNode>();
-	while (lookahead.tokenType == CodeTokenType::Semicolon) {
-		match(CodeTokenType::Semicolon);
-		procs.push_back(proc());
-	}
-	return make_shared<Proc>(afunc->id, b, procs);
+
+	funcTop = saveFEnc;
+
+	return make_shared<Proc>(afunc->id, b, funcTop);
 }
 
 shared_ptr<Constant> Parser::foldConstant(const CodeToken& opToken, ExprNode expr)

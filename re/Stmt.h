@@ -4,6 +4,7 @@
 class Proc;
 class Block;
 class Env;
+class FuncEnv;
 class ConstEnv;
 using ProcNode = shared_ptr<Proc>;
 using BlockNode = shared_ptr < Block>;
@@ -110,10 +111,10 @@ private:
 class Block : public Ast {
 public:
 	AstNode accept(AstVisitor& visitor) override;
-	Block(ProcNode p, BodyNode b, shared_ptr<Env> t, shared_ptr<ConstEnv> cT);
-	Block(ProcNode p, BodyNode b);
+	Block(vector<ProcNode> procs, BodyNode b, shared_ptr<Env> t, shared_ptr<ConstEnv> cT);
+	Block(vector<ProcNode> procs, BodyNode b);
+	vector<ProcNode> procs;	//procedure
 	BodyNode body;
-	ProcNode proc;	//procedure
 	shared_ptr<Env> top;
 	shared_ptr<ConstEnv> constTop;
 };
@@ -121,10 +122,12 @@ public:
 class Proc :public Ast {
 public:
 	AstNode accept(AstVisitor& visitor) override;
-	Proc(IdNode id_, BlockNode block_, std::vector<ProcNode> procs_);
+	Proc(IdNode id_, BlockNode block_, shared_ptr<FuncEnv> preFunc);
+	Proc(IdNode id_, BlockNode block_);
+	void setPreFunc(shared_ptr<FuncEnv> preFunc);
 	IdNode id;
 	BlockNode block;
-	std::vector< shared_ptr<Proc> > procs;
+	shared_ptr<FuncEnv> preFunc;
 };
 
 using ProgramNode = shared_ptr<Program>;
