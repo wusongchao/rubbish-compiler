@@ -9,15 +9,21 @@ begin
     read(x,y,z);
     x := cz+cx+5;
     if x<10 then
+        begin
         y := cx*cy+x;
         z := cy*y
-    else 
+        end
+    else
+        begin
         y := cx*cy+x+10;
         z := cy*y+10
+        end
     ;
     while(z>y) do
+        begin
         x := z+2;
         z := x-1
+        end
     ;
-    write(x*y,y-z,z+x);
+    write(x*y,y-z,z+x)
 end
