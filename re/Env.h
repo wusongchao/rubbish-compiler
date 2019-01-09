@@ -116,7 +116,21 @@ public:
 			cur = cur->prev.get();
 		}
 	}
+	int getSymbolDepth(const string& str) {
+		int depth = 0;
+		auto cur = this;
+		while (cur != nullptr) {
+			auto endIter = cur->table.end();
+			auto it = cur->table.find(str);
+			if (it != endIter) {
+				return depth;
+			}
+			cur = cur->prev.get();
+			++depth;
+		}
 
+		return -1;
+	}
 private:
 	shared_ptr<FuncEnv> prev{ nullptr };
 
