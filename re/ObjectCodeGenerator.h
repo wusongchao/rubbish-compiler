@@ -115,7 +115,6 @@ private:
         }
     }
 
-    void 
 
     void translateIR(QuadPtr quad);
 
