@@ -5,6 +5,7 @@
 
 using std::endl;
 using IR::opcodeToString;
+using IR::VarTag;
 
 class ObjectCodeGenerator {
 public:

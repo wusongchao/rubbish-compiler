@@ -161,6 +161,7 @@
     <ClCompile Include="Scanner.cpp" />
     <ClCompile Include="Stmt.cpp" />
     <ClCompile Include="Type.cpp" />
+    <ClCompile Include="UtilMethods.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="re.rc" />

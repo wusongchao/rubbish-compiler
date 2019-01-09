@@ -55,7 +55,7 @@ void ObjectCodeGenerator::translateIR(QuadPtr quad)
             break;
         case Opcode::Call:
             translateCall(quad);
-            break;n
+            break;
     }
 }
 
@@ -72,6 +72,22 @@ void ObjectCodeGenerator::translateUnary(QuadPtr unary)
     processOperand(unary->src1);
     emitBinaryOp(unary->op);
     processDest(unary->result);
+}
+
+void ObjectCodeGenerator::translateRead(QuadPtr read)
+{
+}
+
+void ObjectCodeGenerator::translateWrite(QuadPtr write)
+{
+}
+
+void ObjectCodeGenerator::translateCall(QuadPtr call)
+{
+}
+
+void ObjectCodeGenerator::translateParam(QuadPtr param)
+{
 }
 
 void ObjectCodeGenerator::translateConditionJmp(QuadPtr jmp)
