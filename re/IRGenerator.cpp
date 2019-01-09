@@ -66,17 +66,18 @@ AstNode IRGenerator::visitBody(BodyNode body)
 
 AstNode IRGenerator::visitBlock(BlockNode block)
 {
-    visit(block->proc);
+    for (const auto& proc : block->procs) {
+        visit(proc);
+    }
     visit(block->body);
     return block;
 }
 
 AstNode IRGenerator::visitProcedure(ProcNode proc)
 {
+    int procLabel = emitLabel(proc->id);
+    markLabel(procLabel);
     visit(proc->block);
-    for (const auto p : proc->procs) {
-        visit(p);
-    }
     return proc;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <stack>
+#include <unordered_map>
 
 #include "AstVisitor.h"
 #include "IR.h"
@@ -9,6 +10,7 @@ using std::vector;
 using std::make_shared;
 using std::stack;
 using std::ostream;
+using std::unordered_map;
 
 using IR::Quad;
 using IR::QuadPtr;
@@ -220,6 +222,16 @@ private:
         auto label{ make_shared<Quad>(Opcode::Label, make_shared<IR::Integer>(number)) };
         labels.push_back(label);
         // for label quad, the src1 is the label number, result is the target number
+        //quads.emplace_back(Opcode::Label, make_shared<IR::Integer>(number));
+        //appendQuad(label);
+        return number;
+    }
+
+    int emitLabel(IdNode id) {
+        int number = labels.size();
+        auto label{ make_shared<Quad>(Opcode::Label, make_shared<IR::Id>(id)) };
+        labels.push_back(label);
+        // for label quad, the src1 is the label number(or identifier), result is the target number
         //quads.emplace_back(Opcode::Label, make_shared<IR::Integer>(number));
         //appendQuad(label);
         return number;

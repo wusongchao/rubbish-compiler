@@ -87,7 +87,7 @@ void test1() {
 	Lexicon lexicon;
 	defineTokens(lexicon);
 
-	std::ifstream infile("../testData/sample3.txt");
+	std::ifstream infile("../testData/controlFlow.txt");
 	if (!infile.is_open())
 	{
 		cout << "can`t open data file" << endl;

@@ -18,13 +18,13 @@ var
             var
                 e,f
             begin
-                call q()
+                e := 15
             end
         begin
-            call r()
+            call q()
         end
     begin
-        call s()
+        x := 1 + 3
     end
 begin
     call p()

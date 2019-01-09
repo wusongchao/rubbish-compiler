@@ -74,6 +74,11 @@ public:
     virtual string toString() override;
 };
 
+class Func : public Id {
+public:
+    Func();
+};
+
 class Temp : public Var{
 public:
     string name;

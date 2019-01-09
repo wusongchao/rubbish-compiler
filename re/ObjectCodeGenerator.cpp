@@ -11,7 +11,13 @@ void ObjectCodeGenerator::generate()
     auto quad = quads[0];
     while (quad != nullptr) {
         translateIR(quad);
+        quad = quad->next;
     }
+}
+
+ObjectCodeGenerator::ObjectCodeGenerator(const vector<QuadPtr>& quads, const vector<QuadPtr>& labels, BlockNode topBlock, ostream & outputStream)
+    :quads(quads), labels(labels), topBlock(topBlock), outputStream(outputStream)
+{
 }
 
 void ObjectCodeGenerator::translateIR(QuadPtr quad)
@@ -76,18 +82,23 @@ void ObjectCodeGenerator::translateUnary(QuadPtr unary)
 
 void ObjectCodeGenerator::translateRead(QuadPtr read)
 {
+    emitRead(read->src1);
 }
 
 void ObjectCodeGenerator::translateWrite(QuadPtr write)
 {
+    emitWrite();
 }
 
 void ObjectCodeGenerator::translateCall(QuadPtr call)
 {
+    
 }
 
 void ObjectCodeGenerator::translateParam(QuadPtr param)
 {
+    // push into stack
+    processOperand(param->src1);
 }
 
 void ObjectCodeGenerator::translateConditionJmp(QuadPtr jmp)

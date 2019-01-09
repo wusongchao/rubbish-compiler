@@ -192,7 +192,7 @@ shared_ptr<Stmt> Parser::stmt()
 			match(CodeTokenType::Id);
 			auto func = funcTop->getSymbol(token);
 			if (func == nullptr || func->id == nullptr) {
-				semanticError("function undefined " + token.value + "in line:" + to_string(token.rowIndex));
+				semanticError("call to undefined function " + token.value + " in line:" + to_string(token.rowIndex));
 			}
 			auto params = std::vector< ExprNode >();
 			match(CodeTokenType::OpenParenthesis);

@@ -13,7 +13,7 @@ public:
 
     ObjectCodeGenerator(const vector<QuadPtr>& quads,
         const vector<QuadPtr>& labels,
-        shared_ptr<Env> topEnv,
+        BlockNode topBlock,
         ostream& outputStream);
 private:
     void emitLoad(VarNode id)
@@ -52,6 +52,28 @@ private:
             << endl;
     }
 
+    void emitRead(VarNode id)
+    {
+        outputStream << "RED" << ' '
+            << topBlock->top->getSymbolDepth(id->toString())
+            << ' , '
+            << id->offset
+            << endl;
+    }
+
+    void emitWrite()
+    {
+        outputStream << "WRT 0 , 0" << endl;
+    }
+
+    void emitInt(int value)
+    {
+        outputStream << "INT 0, "
+            << value
+            << endl;
+    }
+
+    // JPC and JMP
     void emitJmp(Opcode op, int target)
     {
         outputStream << toUpper(opcodeToString(op)) << ' '
@@ -61,6 +83,16 @@ private:
             << endl;
     }
 
+    void emitCall(VarNode func)
+    {
+        outputStream << "CAL" << ' '
+            << '0'
+            << ' , '
+            << func->toString()
+            << endl;
+    }
+
+    // push the operand into the stack
     void processOperand(VarNode operand) {
         switch (operand->tag) {
             case VarTag::Id:
