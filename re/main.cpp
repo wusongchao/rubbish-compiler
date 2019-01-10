@@ -207,6 +207,7 @@ int main()
         ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), p->block);
         objectCodeGenerator.generate();
         objectCodeGenerator.output(std::cout);
+        //
 	}
 	catch (const CompileError& error) {
 		std::cout << error.info << std::endl;
