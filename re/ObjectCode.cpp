@@ -68,5 +68,10 @@ string ObjectCode::Jmp::toString()
 string ObjectCode::Call::toString()
 {
 	
-	return "CAL 0 , " + func;
+	return "CAL 0 , " + to_string(target);
+}
+
+string ObjectCode::Code::toString()
+{
+    return string();
 }

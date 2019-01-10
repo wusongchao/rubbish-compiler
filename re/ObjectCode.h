@@ -85,31 +85,35 @@ public:
 	string toString() override;
 };
 
-class Jmp : public Code {
+class Target : public Code {
 public:
-	int target;
+    int target;
+
+    Target(int target)
+        :target(target)
+    {
+    }
+};
+
+class Jmp : public Target {
+public:
 	string op;
 
 	Jmp(int target, const string& op)
-		:target(target), op(op)
+		:Target(target), op(op)
 	{
 	}
 	Jmp(int target, string&& op)
-		:target(target), op(std::move(op))
+		:Target(target), op(std::move(op))
 	{
 	}
 	string toString() override;
 };
 
-class Call : public Code {
+class Call : public Target {
 public:
-	string func;
-	Call(const string& func)
-		:func(func)
-	{
-	}
-	Call(string&& func)
-		:func(std::move(func))
+	Call(int target)
+		:Target(target)
 	{
 	}
 	string toString() override;

@@ -165,25 +165,36 @@ Quad::Quad(Opcode opcode, VarNode src1, VarNode src2, VarNode dest)
 string Quad::toString() const
 {
     ostringstream stream;
-    stream << '(' << opcodeToString(op) << ", ";
-    if (src1 == nullptr) {
-        stream << '-';
+    if (op == Opcode::Label) {
+        stream << opcodeToString(op) << src1->toString();
+
+        // function label
+        if (src2 != nullptr) {
+            stream << ' ' << src2->toString();
+        }
+
+        stream << ':';
     } else {
-        stream << src1->toString();
+        stream << '(' << opcodeToString(op) << ", ";
+        if (src1 == nullptr) {
+            stream << '-';
+        } else {
+            stream << src1->toString();
+        }
+        stream << ", ";
+        if (src2 == nullptr) {
+            stream << '-';
+        } else {
+            stream << src2->toString();
+        }
+        stream << ", ";
+        if (result == nullptr) {
+            stream << '-';
+        } else {
+            stream << result->toString();
+        }
+        stream << ')';
     }
-    stream << ", ";
-    if (src2 == nullptr) {
-        stream << '-';
-    } else {
-        stream << src2->toString();
-    }
-    stream << ", ";
-    if (result == nullptr) {
-        stream << '-';
-    } else {
-        stream << result->toString();
-    }
-    stream << ')';
 
     return stream.str();
 }

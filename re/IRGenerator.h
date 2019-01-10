@@ -211,10 +211,9 @@ private:
         appendQuad(make_shared<Quad>(Opcode::Write, exp));
     }
 
-    void emitCall(VarNode funcName) {
-        auto call{ make_shared<Quad>(Opcode::Call) };
-        call->result = funcName;
-        appendQuad(call);
+    void emitCall(VarNode labelNumber, VarNode funcName) {
+        // src1 is the labelNumber, result is the label identifier
+        appendQuad(make_shared<Quad>(Opcode::Call, labelNumber, funcName));
     }
 
     int emitLabel() {
@@ -228,10 +227,12 @@ private:
     }
 
     int emitLabel(IdNode id) {
+        // for function label
+        // src1 is the label number, src2 is the identifier
         int number = labels.size();
-        auto label{ make_shared<Quad>(Opcode::Label, make_shared<IR::Id>(id)) };
+        auto label{ make_shared<Quad>(Opcode::Label, make_shared<IR::Integer>(number)) };
+        label->src2 = make_shared<IR::Id>(id);
         labels.push_back(label);
-        // for label quad, the src1 is the label number(or identifier), result is the target number
         //quads.emplace_back(Opcode::Label, make_shared<IR::Integer>(number));
         //appendQuad(label);
         return number;

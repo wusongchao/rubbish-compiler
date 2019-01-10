@@ -88,7 +88,7 @@ void test1() {
 	Lexicon lexicon;
 	defineTokens(lexicon);
 
-	std::ifstream infile("../testData/sample2.txt");
+	std::ifstream infile("../testData/sample1.txt");
 	if (!infile.is_open())
 	{
 		cout << "can`t open data file" << endl;
@@ -107,8 +107,9 @@ void test1() {
 		generator.visit(p);
 
         generator.output(std::cout);
-        ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), p->block, std::cout);
-        //objectCodeGenerator.generate();
+        ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), p->block);
+        objectCodeGenerator.generate();
+        objectCodeGenerator.output(std::cout);
 	}
 	catch (const CompileError& error) {
 		std::cout << error.info << std::endl;
@@ -162,8 +163,9 @@ void test2() {
 
         //generator.output(std::cout);
 
-        ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), p->block, std::cout);
+        ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), p->block);
         objectCodeGenerator.generate();
+        objectCodeGenerator.output(std::cout);
 	}
 	catch (const CompileError& error) {
 		std::cout << error.info << std::endl;

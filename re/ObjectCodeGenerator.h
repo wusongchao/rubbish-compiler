@@ -9,7 +9,7 @@ using IR::opcodeToString;
 using IR::VarTag;
 using namespace ObjectCode;
 using CodePtr = shared_ptr<Code>;
-using JmpPtr = shared_ptr<Jmp>;
+using TargetPtr = shared_ptr<Target>;
 using std::pair;
 
 class ObjectCodeGenerator {
@@ -23,7 +23,6 @@ public:
     }
 
     ObjectCodeGenerator(const vector<QuadPtr>& quads,
-        const vector<QuadPtr>& labels,
         BlockNode topBlock);
 private:
     void emitLoad(VarNode id)
@@ -79,33 +78,44 @@ private:
         codes.push_back(make_shared<Int>(value));
     }
 
-    void recordLabel() {
-
+    // when meet a reference to label
+    void recordLabel(int labelNumber) {
+        beReferencedLabels[labelNumber].second.push_back(jmpCodes.size());
     }
 
-    void markLabel() {
-
+    // when meet a definition of label
+    void markLabel(int labelNumber) {
+        beReferencedLabels[labelNumber].first = codes.size();
     }
 
     // JPC and JMP
-    void emitJmp(Opcode op, int labelNumber)
+    void emitJmp(Opcode op, VarNode target)
     {
-        outputStream << toUpper(opcodeToString(op)) << ' '
-            << '0'
-            << " , "
-            << labelNumber
-            << endl;
-        beReferencedLabels[labelNumber].second.push_back(jmpCodes.size());
+        //outputStream << toUpper(opcodeToString(op)) << ' '
+        //    << '0'
+        //    << " , "
+        //    << labelNumber
+        //    << endl;
+        int labelNumber = static_pointer_cast<IR::Integer>(target)->value;
+        auto jmp{ make_shared<Jmp>(labelNumber, toUpper(opcodeToString(op))) };
+        codes.push_back(jmp);
+        recordLabel(labelNumber);
+        jmpCodes.push_back(jmp);
         // insert the object code
     }
 
-    void emitCall(VarNode func)
+    void emitCall(VarNode label, VarNode id)
     {
-        outputStream << "CAL" << ' '
-            << '0'
-            << " , "
-            << func->toString()
-            << endl;
+        int labelNumber = static_pointer_cast<IR::Integer>(label)->value;
+        //outputStream << "CAL" << ' '
+        //    << '0'
+        //    << " , "
+        //    << func->toString()
+        //    << endl;
+        auto call{ make_shared<ObjectCode::Call>(labelNumber) };
+        codes.push_back(call);
+        recordLabel(labelNumber);
+        jmpCodes.push_back(call);
     }
 
     // push the operand into the stack
@@ -154,9 +164,8 @@ private:
     void translateLabel(QuadPtr label);
 
     vector<QuadPtr> quads;
-    vector<QuadPtr> labels;
     unordered_map<int, pair<int, vector<int>>> beReferencedLabels;
     BlockNode topBlock;
     vector<CodePtr> codes;
-    vector<JmpPtr> jmpCodes;
+    vector<TargetPtr> jmpCodes;
 };

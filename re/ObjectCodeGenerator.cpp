@@ -16,8 +16,8 @@ void ObjectCodeGenerator::generate()
     backpatchJmps();
 }
 
-ObjectCodeGenerator::ObjectCodeGenerator(const vector<QuadPtr>& quads, const vector<QuadPtr>& labels, BlockNode topBlock)
-    :quads(quads), labels(labels), topBlock(topBlock)
+ObjectCodeGenerator::ObjectCodeGenerator(const vector<QuadPtr>& quads, BlockNode topBlock)
+    :quads(quads), topBlock(topBlock)
 {
 }
 
@@ -107,7 +107,7 @@ void ObjectCodeGenerator::translateWrite(QuadPtr write)
 
 void ObjectCodeGenerator::translateCall(QuadPtr call)
 {
-    emitCall(call->result);
+    emitCall(call->src1, call->result);
 }
 
 void ObjectCodeGenerator::translateParam(QuadPtr param)
@@ -120,24 +120,24 @@ void ObjectCodeGenerator::translateConditionJmp(QuadPtr jmp)
 {
     processOperand(jmp->src1);
     processOperand(jmp->src2);
-    int labelNumber = static_pointer_cast<IR::Integer>(jmp->result)->value;
+    //int labelNumber = static_pointer_cast<IR::Integer>(jmp->result)->value;
     //auto labelTarget = stoi(labels[labelVar->value]->result->toString());
-    emitJmp(jmp->op, labelNumber);
+    emitJmp(jmp->op, jmp->result);
 }
 
 void ObjectCodeGenerator::translateOddJmp(QuadPtr jmp)
 {
     processOperand(jmp->src1);
-    int labelNumber = static_pointer_cast<IR::Integer>(jmp->result)->value;
+    //int labelNumber = static_pointer_cast<IR::Integer>(jmp->result)->value;
     //auto labelTarget = stoi(labels[labelVar->value]->result->toString());
-    emitJmp(jmp->op, labelNumber);
+    emitJmp(jmp->op, jmp->result);
 }
 
 void ObjectCodeGenerator::translateJmp(QuadPtr jmp)
 {
-    int labelNumber = static_pointer_cast<IR::Integer>(jmp->result)->value;
+    //int labelNumber = static_pointer_cast<IR::Integer>(jmp->result)->value;
     //auto labelTarget = stoi(labels[labelVar->value]->result->toString());
-    emitJmp(jmp->op, labelNumber);
+    emitJmp(jmp->op, jmp->result);
 }
 
 void ObjectCodeGenerator::translateAssign(QuadPtr assign)

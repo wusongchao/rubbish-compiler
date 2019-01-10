@@ -195,8 +195,15 @@ AstNode IRGenerator::visitCall(CallNode call)
         emitParam(arg);
     }
 
-    auto func{ make_shared<IR::Id>(call->id) };
-    emitCall(func);
+    int i = 0;
+    for (int size = labels.size();i < size;i++) {
+        const auto& label = labels[i];
+        if (label->src2 != nullptr && label->src2->toString() == call->id->toString()) {
+            break;
+        }
+    }
+
+    emitCall(make_shared<IR::Integer>(i), make_shared<IR::Id>(call->id));
     return call;
 }
 
