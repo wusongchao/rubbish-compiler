@@ -17,7 +17,7 @@ shared_ptr<Program> Parser::program()
     match(CodeTokenType::Id);
     match(CodeTokenType::Semicolon);
 
-	auto blockRes = block();
+    auto blockRes{ block() };
     return make_shared<Program>(token,blockRes);
 }
 
@@ -47,7 +47,7 @@ BlockNode Parser::block()
     condecls();
     vardecls();
 
-	auto procs = vector<ProcNode>();
+    vector<ProcNode> procs;
 	if (lookahead.tokenType == CodeTokenType::Procedure) {
 		procs.push_back(proc());
 		CodeToken token = lookahead;
@@ -138,6 +138,21 @@ void Parser::vardecls()
     }
 }
 
+BodyNode Parser::body()
+{
+    //<body> ¡ú begin <statement>{;<statement>}end
+    match(CodeTokenType::Begin);
+    CodeToken token;
+    std::vector<StmtNode> stmts;
+    stmts.push_back(stmt());
+    while (lookahead.tokenType == CodeTokenType::Semicolon) {
+        match(CodeTokenType::Semicolon);
+        stmts.push_back(stmt());
+    }
+    match(CodeTokenType::End);
+    return make_shared<Body>(stmts);
+}
+
 shared_ptr<Stmt> Parser::stmt()
 //<statement> ¡ú <id> : = <exp>
 //| if <lexp> then <statement>[else <statement>]
@@ -164,7 +179,6 @@ shared_ptr<Stmt> Parser::stmt()
 			ExprNode exp = expr();
 			return make_shared<Assign>(id, exp);
 		}
-            break;
         case CodeTokenType::If:
 		{
 			match(CodeTokenType::If);
@@ -179,7 +193,6 @@ shared_ptr<Stmt> Parser::stmt()
 			}
 			return make_shared<If>(lexp, s1);
 		}
-            break;
         case CodeTokenType::While:
 		{
 			match(CodeTokenType::While);
@@ -188,7 +201,6 @@ shared_ptr<Stmt> Parser::stmt()
 			StmtNode s = stmt();
 			return make_shared<While>(lexp, s);
 		}
-            break;
         case CodeTokenType::Call:
 		{
 			match(CodeTokenType::Call);
@@ -214,16 +226,14 @@ shared_ptr<Stmt> Parser::stmt()
 			}
 			match(CodeTokenType::CloseParenthesis);
 			if (params.size() != func->paramType.size()) {
-				syntaxError(string("No find overload function ") + lookahead.value +string(" in line ")+ to_string(lookahead.rowIndex));
+				syntaxError(string("argument list not match") + lookahead.value +string(" in line ")+ to_string(lookahead.rowIndex));
 			}
 			return make_shared<Call>(func->id, params);
 		}
-            break;
         case CodeTokenType::Begin:
 		{
 			return body();
 		}
-            break;
         case CodeTokenType::Read:
 		{
 			match(CodeTokenType::Read);
@@ -248,7 +258,6 @@ shared_ptr<Stmt> Parser::stmt()
 			return make_shared<Read>(ids);
 
 		}
-            break;
         case CodeTokenType::Write:
 		{
 			match(CodeTokenType::Write);
@@ -268,7 +277,6 @@ shared_ptr<Stmt> Parser::stmt()
 			return make_shared< Write >(exprs);
 
 		}
-            break;
         default:
 		{
 			SyntaxError(string("syntax Error near line: ") + to_string(lookahead.rowIndex));
@@ -371,21 +379,6 @@ shared_ptr<Expr> Parser::expr()
         }
     }
     return x;
-}
-
-BodyNode Parser::body()
-{
-	//<body> ¡ú begin <statement>{;<statement>}end
-	match(CodeTokenType::Begin);
-	CodeToken token;
-	std::vector<StmtNode> stmts;
-    stmts.push_back(stmt());
-    while (lookahead.tokenType == CodeTokenType::Semicolon) {
-        match(CodeTokenType::Semicolon);
-        stmts.push_back(stmt());
-    }
-    match(CodeTokenType::End);
-	return make_shared<Body>(stmts);
 }
 
 shared_ptr<Expr> Parser::term()

@@ -71,7 +71,7 @@ public:
 
     Id(IdNode node);
 
-    virtual string toString() override;
+    string toString() override;
 };
 
 class Func : public Id {
@@ -86,7 +86,7 @@ public:
     Temp(int number, const Type& type);
     Temp(int number, int width);
 
-    virtual string toString() override;
+    string toString() override;
 };
 
 class Constant : public Var {
@@ -99,7 +99,7 @@ public:
     int value;
 
     Integer(int value);
-    virtual string toString() override;
+    string toString() override;
 };
 
 class Bool : public Constant {
@@ -107,7 +107,7 @@ public:
     bool value;
 
     Bool(bool value);
-    virtual string toString() override;
+    string toString() override;
 };
 
 string opcodeToString(Opcode opcode);

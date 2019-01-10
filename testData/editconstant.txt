@@ -1,0 +1,9 @@
+program error;
+const 
+  i := 2,
+  i2 := 3
+var a, b, c
+begin
+if a <> b then
+  i := 3
+end

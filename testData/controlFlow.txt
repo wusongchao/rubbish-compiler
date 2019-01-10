@@ -1,16 +1,17 @@
-program fuck;
-const i := 2
-  ,i2 := 3
+program control;
+const 
+  i := 2,
+  i2 := 3
 var a, b, c
 // this is comment
 begin
-while (odd a && b <> 2) do
-a := 1 + 2 + b;
+  while (odd a && b <> 2) do
+    a := 1 + 2 + b;
 
 if (!(odd i2) || false) then
-c := -7
+  c := -7
 else if c > 3 then
-c := c + 1
+  c := c + 1
 else
-b := i2 + 3 - (5 * i) * 5
+  b := i2 + 3 - (5 * i) * 5
 end

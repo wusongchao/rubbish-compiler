@@ -88,7 +88,8 @@ void test1() {
 	Lexicon lexicon;
 	defineTokens(lexicon);
 
-	std::ifstream infile("../testData/sample1.txt");
+	std::ifstream infile("../testData/controlFlow.txt");
+    std::ofstream outfile("../testData/controlFlow.a");
 	if (!infile.is_open())
 	{
 		cout << "can`t open data file" << endl;
@@ -106,10 +107,10 @@ void test1() {
 		IRGenerator generator;
 		generator.visit(p);
 
-        generator.output(std::cout);
+        generator.output(outfile);
         ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), p->block);
         objectCodeGenerator.generate();
-        objectCodeGenerator.output(std::cout);
+        objectCodeGenerator.output(outfile);
 	}
 	catch (const CompileError& error) {
 		std::cout << error.info << std::endl;
@@ -175,7 +176,41 @@ void test2() {
 
 int main()
 {
-	test1();
+	//test1();
 	//test2();
+    Lexicon lexicon;
+
+	defineTokens(lexicon);
+
+    std::ifstream infile("../testData/controlFlow.txt");
+    //std::ofstream outfile("../testData/editconstant.a");
+    if (!infile.is_open())
+    {
+        cout << "can`t open data file" << endl;
+    }
+    istream& stream = infile;
+
+	Scanner scanner(stream, lexicon.createScannerInfo());
+	scanner.addSkipToken(CodeTokenType::WhiteSpace);
+	scanner.addSkipToken(CodeTokenType::LineBreaker);
+	scanner.addSkipToken(CodeTokenType::Comment);
+
+
+	Parser parser(scanner);
+	try {
+		auto p = parser.program();
+		IRGenerator generator;
+		generator.visit(p);
+
+        generator.output(std::cout);
+
+        ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), p->block);
+        objectCodeGenerator.generate();
+        objectCodeGenerator.output(std::cout);
+	}
+	catch (const CompileError& error) {
+		std::cout << error.info << std::endl;
+	}
+	cin.get();
     return 0;
 }
