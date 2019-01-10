@@ -11,28 +11,23 @@ string ObjectCode::Read::toString()
 	outputStream << "RED" << ' '
 		<< depth
 		<< " , "
-		<< offset << endl;
+		<< offset;
     return outputStream.str();
 }
 
-string ObjectCode::Lod::toString()
+string ObjectCode::Load::toString()
 {
 	ostringstream outputStream;
-	outputStream << "RED" << ' '
+	outputStream << "LOD" << ' '
 		<< depth
 		<< " , "
-		<< offset<< endl;
+		<< offset;
 	return outputStream.str();
 }
 
 string ObjectCode::Lit::toString()
 {
-	ostringstream outputStream;
-	outputStream << "LIT" << ' '
-		<< '0'
-		<< " , "
-		<< constant<<endl;
-	return outputStream.str();
+    return "LIT 0 , " + constant;
 }
 
 string ObjectCode::Store::toString()
@@ -41,43 +36,37 @@ string ObjectCode::Store::toString()
 	outputStream << "STO" << ' '
 		<< depth
 		<< " , "
-		<< offset <<endl;
+		<< offset;
 	return outputStream.str();
 }
 
 string ObjectCode::BinaryOp::toString()
 {
-	ostringstream outputStream;
-	outputStream << "RED" << ' '
-		<< '0'
-		<< " , "
-		<< opStr<<endl;
-	return outputStream.str();
+    return "OPR 0 , " + opStr;
 }
 
 string ObjectCode::Write::toString()
 {
-	return string("WRT 0 , 0\n");
+	return string("WRT 0 , 0");
 }
 
 string ObjectCode::Int::toString()
 {
-	return string("INT 0,") + to_string(value) + '\n';
+	return string("INT 0 , ") + to_string(value);
 }
 
 string ObjectCode::Jmp::toString()
 {
 	ostringstream outputStream;
-	outputStream<<op<<' '
-		<< '0'
-		<< " , "
-		<< target
-		<< endl;
+    outputStream << op << ' '
+        << '0'
+        << " , "
+        << target;
 	return outputStream.str();
 }
 
 string ObjectCode::Call::toString()
 {
 	
-	return string("CAL 0,")+func+'\n';
+	return "CAL 0 , " + func;
 }

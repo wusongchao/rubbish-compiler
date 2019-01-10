@@ -16,8 +16,8 @@ void ObjectCodeGenerator::generate()
     backpatchJmps();
 }
 
-ObjectCodeGenerator::ObjectCodeGenerator(const vector<QuadPtr>& quads, BlockNode topBlock)
-    :quads(quads), topBlock(topBlock)
+ObjectCodeGenerator::ObjectCodeGenerator(const vector<QuadPtr>& quads, const vector<QuadPtr>& labels, BlockNode topBlock)
+    :quads(quads), labels(labels), topBlock(topBlock)
 {
 }
 
@@ -157,7 +157,7 @@ void ObjectCodeGenerator::translateLabel(QuadPtr label)
     // ...
     // l1:
     // ...
-    beReferencedLabels[labelNumber].first = objectCodes.size();
+    beReferencedLabels[labelNumber].first = codes.size();
 
     // when meet the definition, can define its actual position
 }

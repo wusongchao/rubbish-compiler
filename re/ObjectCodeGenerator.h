@@ -7,7 +7,9 @@
 using std::endl;
 using IR::opcodeToString;
 using IR::VarTag;
-using CodePtr = shared_ptr<ObjectCode::ObjectCode>;
+using namespace ObjectCode;
+using CodePtr = shared_ptr<Code>;
+using JmpPtr = shared_ptr<Jmp>;
 using std::pair;
 
 class ObjectCodeGenerator {
@@ -15,71 +17,74 @@ public:
     void generate();
 
     void output(ostream& stream) {
-        for (const auto& code : objectCodes) {
+        for (const auto& code : codes) {
             stream << code->toString() << endl;
         }
     }
 
     ObjectCodeGenerator(const vector<QuadPtr>& quads,
+        const vector<QuadPtr>& labels,
         BlockNode topBlock);
 private:
     void emitLoad(VarNode id)
     {
-        auto s = id->toString();
-        outputStream << "LOD" << ' '
-            << topBlock->top->getSymbolDepth(id->toString())
-            << " , "
-            << id->offset
-            << endl;
-        objectCodes.push_back(make_shared<>());
+        int depth = topBlock->top->getSymbolDepth(id->toString());
+        codes.push_back(make_shared<Load>(depth, id->offset));
     }
 
     void emitLit(VarNode constant)
     {
-        outputStream << "LIT" << ' '
-            << '0'
-            << " , "
-            << constant->toString()
-            << endl;
+        //outputStream << "LIT" << ' '
+        //    << '0'
+        //    << " , "
+        //    << constant->toString()
+        //    << endl;
+        codes.push_back(make_shared<Lit>(constant->toString()));
     }
 
     void emitStore(VarNode id)
     {
-        outputStream << "STO" << ' '
-            << topBlock->top->getSymbolDepth(id->toString())
-            << " , "
-            << id->offset
-            << endl;
+        //outputStream << "STO" << ' '
+        //    << topBlock->top->getSymbolDepth(id->toString())
+        //    << " , "
+        //    << id->offset
+        //    << endl;
+        int depth = topBlock->top->getSymbolDepth(id->toString());
+        codes.push_back(make_shared<Store>(depth, id->offset));
     }
 
     void emitBinaryOp(Opcode op)
     {
-        outputStream << "OPR" << ' '
-            << '0'
-            << " , "
-            << opcodeToString(op)
-            << endl;
+        //outputStream << "OPR" << ' '
+        //    << '0'
+        //    << " , "
+        //    << opcodeToString(op)
+        //    << endl;
+        codes.push_back(make_shared<BinaryOp>(opcodeToString(op)));
     }
 
     void emitRead(VarNode id)
     {
-        outputStream << "RED" << ' '
-            << topBlock->top->getSymbolDepth(id->toString())
-            << " , "
-            << id->offset
-            << endl;
+        int depth = topBlock->top->getSymbolDepth(id->toString());
+        codes.push_back(make_shared<ObjectCode::Read>(depth, id->offset));
     }
 
     void emitWrite()
     {
-        outputStream << "WRT 0 , 0" << endl;
+        codes.push_back(make_shared<ObjectCode::Write>());
     }
 
     void emitInt(int value)
     {
-        outputStream << "INT 0, "
-            << value
-            << endl;
+        codes.push_back(make_shared<Int>(value));
+    }
+
+    void recordLabel() {
+
+    }
+
+    void markLabel() {
+
     }
 
     // JPC and JMP
@@ -149,9 +154,9 @@ private:
     void translateLabel(QuadPtr label);
 
     vector<QuadPtr> quads;
-    //vector<QuadPtr> labels;
+    vector<QuadPtr> labels;
     unordered_map<int, pair<int, vector<int>>> beReferencedLabels;
     BlockNode topBlock;
-    vector<CodePtr> objectCodes;
-    vector<CodePtr> jmpCodes;
+    vector<CodePtr> codes;
+    vector<JmpPtr> jmpCodes;
 };
