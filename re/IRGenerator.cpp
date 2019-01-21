@@ -66,12 +66,15 @@ AstNode IRGenerator::visitBody(BodyNode body)
 
 AstNode IRGenerator::visitBlock(BlockNode block)
 {
-    int bodyLabel = emitLabel();
-    emitJmp(bodyLabel);
-    for (const auto& proc : block->procs) {
-        visit(proc);
+    // jump the procedure definition code
+    if (!block->procs.empty()) {
+        int bodyLabel = emitLabel();
+        emitJmp(bodyLabel);
+        for (const auto& proc : block->procs) {
+            visit(proc);
+        }
+        markLabel(bodyLabel);
     }
-    markLabel(bodyLabel);
     visit(block->body);
     return block;
 }

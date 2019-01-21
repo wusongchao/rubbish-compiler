@@ -21,6 +21,8 @@ public:
 
 using StmtNode = shared_ptr<Stmt>;
 
+// why take a value shared_ptr as input?
+// the class ctor will copy it anyway
 class Assign : public Stmt {
 public:
 	Assign(shared_ptr<Id> id_, ExprNode expr_);

@@ -148,17 +148,17 @@ Quad::Quad(Opcode opcode)
 }
 
 Quad::Quad(Opcode opcode, VarNode src)
-    :op(opcode), src1(src)
+    :op(opcode), src1(std::move(src))
 {
 }
 
 Quad::Quad(Opcode opcode, VarNode src, VarNode dest)
-    :op(opcode), src1(src), result(dest)
+    :op(opcode), src1(std::move(src)), result(std::move(dest))
 {
 }
 
 Quad::Quad(Opcode opcode, VarNode src1, VarNode src2, VarNode dest)
-    :op(opcode), src1(src1), src2(src2), result(dest)
+    :op(opcode), src1(std::move(src1)), src2(std::move(src2)), result(std::move(dest))
 {
 }
 

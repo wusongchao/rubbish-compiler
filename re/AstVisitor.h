@@ -5,6 +5,18 @@
 #include "Op.h"
 #include "Logical.h"
 
+// take raw pointer as input
+//Guideline: Don¡¯t pass a smart pointer as a function parameter unless 
+//you want to use or manipulate the smart pointer itself, 
+//such as to share or transfer ownership.
+//
+//Guideline : Express that a function will store and share ownership of a heap object 
+//using a by - value shared_ptr parameter.
+//
+//Guideline : Use a non - const shared_ptr& parameter only to modify the shared_ptr.
+//Use a const shared_ptr& as a parameter only if you¡¯re not sure whether or not you¡¯ll take a copy and share ownership; 
+//otherwise use widget* instead(or if not nullable, a widget&).
+
 class AstVisitor {
 public:
     virtual AstNode visit(AstNode astNode);

@@ -21,3 +21,5 @@ public:
 };
 
 using AstNode = shared_ptr<Ast>;
+
+using AstPtr = Ast*;
