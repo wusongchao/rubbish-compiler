@@ -11,6 +11,7 @@ using std::make_shared;
 using std::stack;
 using std::ostream;
 using std::unordered_map;
+using namespace AST;
 
 using IR::Quad;
 using IR::QuadPtr;
@@ -44,49 +45,49 @@ public:
         }
     }
 
-    AstNode visitProgram(shared_ptr<Program> program) override;
+    Ast* visitProgram(Program* program) override;
 
-    AstNode visitBody(BodyNode body) override;
+    Ast* visitBody(Body* body) override;
 
-    AstNode visitBlock(BlockNode block) override;
+    Ast* visitBlock(Block* block) override;
 
-    AstNode visitProcedure(ProcNode proc) override;
+    Ast* visitProcedure(Proc* proc) override;
 
-    AstNode visitAssign(AssignNode assign) override;
+    Ast* visitAssign(Assign* assign) override;
 
-    AstNode visitExpr(ExprNode expr) override;
+    Ast* visitExpr(Expr* expr) override;
 
-    AstNode visitIf(IfNode ifNode) override;
+    Ast* visitIf(If* ifNode) override;
 
-    AstNode visitWhile(WhileNode whileNode) override;
+    Ast* visitWhile(While* whileNode) override;
 
-    AstNode visitCall(CallNode call) override;
+    Ast* visitCall(Call* call) override;
 
-    AstNode visitRead(ReadNode read) override;
+    Ast* visitRead(Read* read) override;
 
-    AstNode visitWrite(WriteNode write) override;
+    Ast* visitWrite(Write* write) override;
 
-    AstNode visitLogical(LogicalNode logical) override;
+    Ast* visitLogical(Logical* logical) override;
 
-    AstNode visitOr(OrNode orNode) override;
+    Ast* visitOr(Or* orNode) override;
 
-    AstNode visitAnd(AndNode andNode) override;
+    Ast* visitAnd(And* andNode) override;
 
-    AstNode visitNot(NotNode notNode) override;
+    Ast* visitNot(Not* notNode) override;
 
-    AstNode visitOdd(OddNode oddNode) override;
+    Ast* visitOdd(Odd* oddNode) override;
 
-    AstNode visitRel(RelNode rel) override;
+    Ast* visitRel(Rel* rel) override;
 
-    AstNode visitArith(ArithNode arith) override;
+    Ast* visitArith(Arith* arith) override;
 
-    AstNode visitOp(OpNode op) override;
+    Ast* visitOp(Op* op) override;
 
-    AstNode visitUnary(UnaryNode unary) override;
+    Ast* visitUnary(Unary* unary) override;
 
-    AstNode visitConstant(ConstantNode constant) override;
+    Ast* visitConstant(Constant* constant) override;
 
-    AstNode visitId(IdNode id) override;
+    Ast* visitId(Id* id) override;
 
 private:
     //TempNode emitBinary(const CodeToken& opToken, const Type& resType, const ExprNode& lhs, const ExprNode& rhs);
@@ -159,7 +160,7 @@ private:
 
     void emitJmp(VarNode dest) {
         auto jmp{ make_shared<Quad>(Opcode::Jmp) };
-        jmp->result = dest;
+        jmp->result = std::move(dest);
         appendQuad(jmp);
         //quads.push_back(jmp);
     }
@@ -170,16 +171,16 @@ private:
     }
 
     void emitOddJmp(Opcode op, VarNode src, VarNode dest) {
-        appendQuad(make_shared<Quad>(op, src, dest));
+        appendQuad(make_shared<Quad>(op, std::move(src), std::move(dest)));
     }
 
     void emitOddJmp(Opcode op, VarNode src, int label) {
-        auto dest{ make_shared<IR::Integer>(label) };
-        emitOddJmp(op, src, dest);
+        //auto dest{ make_shared<IR::Integer>(label) };
+        emitOddJmp(op, std::move(src), make_shared<IR::Integer>(label));
     }
 
     void emitArith(Opcode op, VarNode src1, VarNode src2, VarNode dest) {
-        appendQuad(make_shared<Quad>(op, src1, src2, dest));
+        appendQuad(make_shared<Quad>(op, std::move(src1), std::move(src2), std::move(dest)));
         //quads.emplace_back(op, src1, src2, dest);
     }
 
@@ -192,28 +193,28 @@ private:
     //}
 
     void emitUnary(Opcode op, VarNode src, VarNode dest) {
-        appendQuad(make_shared<Quad>(op, src, dest));
+        appendQuad(make_shared<Quad>(op, std::move(src), std::move(dest)));
     }
 
     void emitAssign(VarNode src, VarNode dest) {
-        appendQuad(make_shared<Quad>(Opcode::Assign, src, dest));
+        appendQuad(make_shared<Quad>(Opcode::Assign, std::move(src), std::move(dest)));
     }
 
     void emitParam(VarNode param) {
-        appendQuad(make_shared<Quad>(Opcode::Param, param));
+        appendQuad(make_shared<Quad>(Opcode::Param, std::move(param)));
     }
 
     void emitRead(VarNode id) {
-        appendQuad(make_shared<Quad>(Opcode::Read, id));
+        appendQuad(make_shared<Quad>(Opcode::Read, std::move(id)));
     }
 
     void emitWrite(VarNode exp) {
-        appendQuad(make_shared<Quad>(Opcode::Write, exp));
+        appendQuad(make_shared<Quad>(Opcode::Write, std::move(exp)));
     }
 
     void emitCall(VarNode labelNumber, VarNode funcName) {
         // src1 is the labelNumber, result is the label identifier
-        appendQuad(make_shared<Quad>(Opcode::Call, labelNumber, funcName));
+        appendQuad(make_shared<Quad>(Opcode::Call, std::move(labelNumber), std::move(funcName)));
     }
 
     int emitLabel() {

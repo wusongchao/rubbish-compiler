@@ -8,7 +8,7 @@ using std::stoi;
 // when expand a sub procedure
 // it accept its parameter from stack
 // and return value by pushing to the stack
-AstNode IRGenerator::visitConstant(ConstantNode expr)
+Ast* IRGenerator::visitConstant(Constant* expr)
 {
     switch (expr->type.tag) {
         case TypeTag::Bool:
@@ -44,67 +44,67 @@ AstNode IRGenerator::visitConstant(ConstantNode expr)
     return expr;
 }
 
-AstNode IRGenerator::visitId(IdNode id)
+Ast* IRGenerator::visitId(Id* id)
 {
     operateStack.push(make_shared<IR::Id>(id));
     return id;
 }
 
-AstNode IRGenerator::visitProgram(shared_ptr<Program> program)
+Ast* IRGenerator::visitProgram(Program* program)
 {
-    visitBlock(program->block);
+    visitBlock(program->block.get());
     return program;
 }
 
-AstNode IRGenerator::visitBody(BodyNode body)
+Ast* IRGenerator::visitBody(Body* body)
 {
     for (const auto& stmt : body->stmts) {
-        visit(stmt);
+        visit(stmt.get());
     }
     return body;
 }
 
-AstNode IRGenerator::visitBlock(BlockNode block)
+Ast* IRGenerator::visitBlock(Block* block)
 {
     // jump the procedure definition code
     if (!block->procs.empty()) {
         int bodyLabel = emitLabel();
         emitJmp(bodyLabel);
         for (const auto& proc : block->procs) {
-            visit(proc);
+            visit(proc.get());
         }
         markLabel(bodyLabel);
     }
-    visit(block->body);
+    visit(block->body.get());
     return block;
 }
 
-AstNode IRGenerator::visitProcedure(ProcNode proc)
+Ast* IRGenerator::visitProcedure(Proc* proc)
 {
     int procLabel = emitLabel(proc->id);
     markLabel(procLabel);
-    visit(proc->block);
+    visit(proc->block.get());
     return proc;
 }
 
-AstNode IRGenerator::visitAssign(AssignNode assign)
+Ast* IRGenerator::visitAssign(Assign* assign)
 {
-    visit(assign->expr);
+    visit(assign->expr.get());
     auto src{ operateStack.top() };
     operateStack.pop();
 
     auto dest{ make_shared<IR::Id>(assign->id) };
-    emitAssign(src, dest);
+    emitAssign(std::move(src), std::move(dest));
 
     return assign;
 }
 
-AstNode IRGenerator::visitExpr(ExprNode expr)
+Ast* IRGenerator::visitExpr(Expr* expr)
 {
     return visit(expr);
 }
 
-AstNode IRGenerator::visitIf(IfNode ifNode)
+Ast* IRGenerator::visitIf(If* ifNode)
 {
     //int ifLabel = emitLabel();
     // logical expression
@@ -118,10 +118,10 @@ AstNode IRGenerator::visitIf(IfNode ifNode)
         labelStack.push(trueLabel);
         labelStack.push(elseLabel);
         // generate B.code
-        visit(ifNode->cond);
+        visit(ifNode->cond.get());
        
         // generate S1.code
-        visit(ifNode->trueStmt);
+        visit(ifNode->trueStmt.get());
 
         // goto S.next(endLabel)
         emitJmp(endLabel);
@@ -129,7 +129,7 @@ AstNode IRGenerator::visitIf(IfNode ifNode)
         // label(B.false) elseLabel
         markLabel(elseLabel);
         // generate S2.code
-        visit(ifNode->falseStmt);
+        visit(ifNode->falseStmt.get());
         markLabel(endLabel);
     } else {
         int trueLabel = Fall;
@@ -140,11 +140,11 @@ AstNode IRGenerator::visitIf(IfNode ifNode)
         labelStack.push(trueLabel);
         labelStack.push(endLabel);
         // generate B.code
-        visit(ifNode->cond);
+        visit(ifNode->cond.get());
 
         // generate S1.code
         // see the "dragon book" p261
-        visit(ifNode->trueStmt);
+        visit(ifNode->trueStmt.get());
 
         markLabel(endLabel);
     }
@@ -152,7 +152,7 @@ AstNode IRGenerator::visitIf(IfNode ifNode)
     return ifNode;
 }
 
-AstNode IRGenerator::visitWhile(WhileNode whileNode)
+Ast* IRGenerator::visitWhile(While* whileNode)
 {
     int beginLabel = emitLabel();
     int trueLabel = Fall;
@@ -165,10 +165,10 @@ AstNode IRGenerator::visitWhile(WhileNode whileNode)
     labelStack.push(trueLabel);
     labelStack.push(endLabel);
     // B.code
-    visit(whileNode->cond);
+    visit(whileNode->cond.get());
 
     // S.code
-    visit(whileNode->stmt);
+    visit(whileNode->stmt.get());
 
     // gen(goto begin)
     emitJmp(beginLabel);
@@ -178,7 +178,7 @@ AstNode IRGenerator::visitWhile(WhileNode whileNode)
     return whileNode;
 }
 
-AstNode IRGenerator::visitCall(CallNode call)
+Ast* IRGenerator::visitCall(Call* call)
 {
     // call param1, param2, ... , paramn
     // generate code:
@@ -189,7 +189,7 @@ AstNode IRGenerator::visitCall(CallNode call)
     const auto& params = call->param;
     for (auto it = params.rbegin(); it != params.rend(); ++it)
     {
-        visit(*it);
+        visit(it->get());
 
         // get the argument by visit expressions(do the evaluation)
         auto arg{ operateStack.top() };
@@ -210,7 +210,7 @@ AstNode IRGenerator::visitCall(CallNode call)
     return call;
 }
 
-AstNode IRGenerator::visitRead(ReadNode read)
+Ast* IRGenerator::visitRead(Read* read)
 {
     // for read i1, i2, ..., in
     // generate code:
@@ -220,7 +220,7 @@ AstNode IRGenerator::visitRead(ReadNode read)
     const auto& datas = read->datas;
     for (auto it = datas.rbegin(); it != datas.rend(); ++it)
     {
-        visit(*it);
+        visit(it->get());
 
         // get the argument by visit expressions(do the evaluation)
         auto arg{ operateStack.top() };
@@ -232,7 +232,7 @@ AstNode IRGenerator::visitRead(ReadNode read)
     return read;
 }
 
-AstNode IRGenerator::visitWrite(WriteNode write)
+Ast* IRGenerator::visitWrite(Write* write)
 {
     // for write expr1, expr2, expr3...
     // generate code:
@@ -242,7 +242,7 @@ AstNode IRGenerator::visitWrite(WriteNode write)
 
     // the difference comes from the object machine's stack structure
     for (const auto& exp : write->datas) {
-        visit(exp);
+        visit(exp.get());
 
         auto arg{ operateStack.top() };
         operateStack.pop();
@@ -253,12 +253,12 @@ AstNode IRGenerator::visitWrite(WriteNode write)
     return write;
 }
 
-AstNode IRGenerator::visitLogical(LogicalNode logical)
+Ast* IRGenerator::visitLogical(Logical* logical)
 {
     return visit(logical);
 }
 
-AstNode IRGenerator::visitOr(OrNode orNode)
+Ast* IRGenerator::visitOr(Or* orNode)
 {
     // also see the "dragon book" p261
     // for more information about the sequence, 
@@ -279,10 +279,10 @@ AstNode IRGenerator::visitOr(OrNode orNode)
     // B1.code || B2.code
     labelStack.push(expr1True);
     labelStack.push(expr1False);
-    visit(orNode->expr1);
+    visit(orNode->expr1.get());
     labelStack.push(expr2True);
     labelStack.push(expr2False);
-    visit(orNode->expr2);
+    visit(orNode->expr2.get());
     // if B.true == fall
     if (parentTrue == Fall) {
         markLabel(expr1True);
@@ -291,7 +291,7 @@ AstNode IRGenerator::visitOr(OrNode orNode)
     return orNode;
 }
 
-AstNode IRGenerator::visitAnd(AndNode andNode)
+Ast* IRGenerator::visitAnd(And* andNode)
 {
     // also see the "dragon book" p261
     // for more information about the sequence, 
@@ -316,10 +316,10 @@ AstNode IRGenerator::visitAnd(AndNode andNode)
     // B1.code || B2.code
     labelStack.push(expr1True);
     labelStack.push(expr1False);
-    visit(andNode->expr1);
+    visit(andNode->expr1.get());
     labelStack.push(expr2True);
     labelStack.push(expr2False);
-    visit(andNode->expr2);
+    visit(andNode->expr2.get());
     // if B.false == fall
     if (parentFalse == Fall) {
         markLabel(expr1False);
@@ -328,7 +328,7 @@ AstNode IRGenerator::visitAnd(AndNode andNode)
     return andNode;
 }
 
-AstNode IRGenerator::visitNot(NotNode notNode)
+Ast* IRGenerator::visitNot(Not* notNode)
 {
     int falseLabel = labelStack.top();
     labelStack.pop();
@@ -339,16 +339,16 @@ AstNode IRGenerator::visitNot(NotNode notNode)
     // B1.false = B.true
     labelStack.push(falseLabel);
     labelStack.push(trueLabel);
-    visit(notNode->expr1);
+    visit(notNode->expr1.get());
 
     return notNode;
 }
 
-AstNode IRGenerator::visitOdd(OddNode oddNode)
+Ast* IRGenerator::visitOdd(Odd* oddNode)
 {
     // B -> odd E
     // similar rule as rel
-    visit(oddNode->expr1);
+    visit(oddNode->expr1.get());
 
     auto src{ operateStack.top() };
     operateStack.pop();
@@ -373,16 +373,16 @@ AstNode IRGenerator::visitOdd(OddNode oddNode)
     return oddNode;
 }
 
-AstNode IRGenerator::visitRel(RelNode rel)
+Ast* IRGenerator::visitRel(Rel* rel)
 {
-    visit(rel->expr1);
-    visit(rel->expr2);
-
-    // src1 was pushed into the stack first
-    auto src2{ operateStack.top() };
-    operateStack.pop();
+    visit(rel->expr1.get());
     auto src1{ operateStack.top() };
     operateStack.pop();
+
+    visit(rel->expr2.get());
+    auto src2{ operateStack.top() };
+    operateStack.pop();
+
 
     // the same rule as below
     // since B.true was pushed into the stack first
@@ -414,15 +414,16 @@ AstNode IRGenerator::visitRel(RelNode rel)
     return rel;
 }
 
-AstNode IRGenerator::visitArith(ArithNode arith)
+Ast* IRGenerator::visitArith(Arith* arith)
 {
-    visit(arith->expr1);
-    visit(arith->expr2);
-
-    auto src2{ operateStack.top() };
-    operateStack.pop();
+    visit(arith->expr1.get());
     auto src1{ operateStack.top() };
     operateStack.pop();
+
+    visit(arith->expr2.get());
+    auto src2{ operateStack.top() };
+    operateStack.pop();
+
 
     // similar to visitArith(visit(expr1), visit(expr2))
 
@@ -445,14 +446,14 @@ AstNode IRGenerator::visitArith(ArithNode arith)
     return arith;
 }
 
-AstNode IRGenerator::visitOp(OpNode op)
+Ast* IRGenerator::visitOp(Op* op)
 {
     return visit(op);
 }
 
-AstNode IRGenerator::visitUnary(UnaryNode unary)
+Ast* IRGenerator::visitUnary(Unary* unary)
 {
-    visit(unary->expr);
+    visit(unary->expr.get());
     auto src{ operateStack.top() };
     operateStack.pop();
 

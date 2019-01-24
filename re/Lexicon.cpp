@@ -27,6 +27,8 @@ ScannerInfo Lexicon::createScannerInfo()
     // here, we will choose the first listed mode
     // DFAAcceptState : 3: {6, 8}, choose 6->tokenType
     // so 3->tokenType
+    // so the lexicon definition sequence do matter its priority
+    // dfa finite state -> nfa finite state -> token type
     unordered_map<int, CodeTokenType> nfaStateToTokenMap;
 
     for (const auto& t : tokenInfos) {
@@ -43,7 +45,7 @@ ScannerInfo Lexicon::createScannerInfo()
     DFAModel dfaModel;
     dfaModel.convertFrom(entryState, lexerNFA);
 
-    auto dfaStateToTokenMap = make_unique<unordered_map<int, CodeTokenType>>();
+    auto dfaStateToTokenMap{ make_unique<unordered_map<int, CodeTokenType>>() };
 
     const auto& dfaStates = dfaModel.getDFAStates();
     for (int i = 0; i < dfaStates.size();i++) {

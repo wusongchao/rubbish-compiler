@@ -17,51 +17,53 @@
 //Use a const shared_ptr& as a parameter only if you¡¯re not sure whether or not you¡¯ll take a copy and share ownership; 
 //otherwise use widget* instead(or if not nullable, a widget&).
 
+using namespace AST;
+
 class AstVisitor {
 public:
-    virtual AstNode visit(AstNode astNode);
+    virtual Ast* visit(Ast* ast);
 
-    virtual AstNode visitProgram(ProgramNode program) = 0;
+    virtual Ast* visitProgram(Program* program) = 0;
 
-    virtual AstNode visitBlock(BlockNode block) = 0;
+    virtual Ast* visitBlock(Block* block) = 0;
 
-    virtual AstNode visitProcedure(ProcNode proc) = 0;
+    virtual Ast* visitProcedure(Proc* proc) = 0;
 
-    virtual AstNode visitBody(BodyNode body) = 0;
+    virtual Ast* visitBody(Body* body) = 0;
 
-    virtual AstNode visitAssign(AssignNode assign) = 0;
+    virtual Ast* visitAssign(Assign* assign) = 0;
 
-    virtual AstNode visitIf(IfNode ifNode) = 0;
+    virtual Ast* visitIf(If* ifNode) = 0;
 
-    virtual AstNode visitWhile(WhileNode whileNode) = 0;
+    virtual Ast* visitWhile(While* whileNode) = 0;
 
-    virtual AstNode visitCall(CallNode call) = 0;
+    virtual Ast* visitCall(Call* call) = 0;
 
-    virtual AstNode visitRead(ReadNode read) = 0;
+    virtual Ast* visitRead(Read* read) = 0;
 
-    virtual AstNode visitWrite(WriteNode write) = 0;
+    virtual Ast* visitWrite(Write* write) = 0;
 
-    virtual AstNode visitExpr(ExprNode expr) = 0;
+    virtual Ast* visitExpr(Expr* expr) = 0;
 
-    virtual AstNode visitLogical(LogicalNode logical) = 0;
+    virtual Ast* visitLogical(Logical* logical) = 0;
 
-    virtual AstNode visitRel(RelNode rel) = 0;
+    virtual Ast* visitRel(Rel* rel) = 0;
 
-    virtual AstNode visitOr(OrNode orNode) = 0;
+    virtual Ast* visitOr(Or* orNode) = 0;
 
-    virtual AstNode visitAnd(AndNode andNode) = 0;
+    virtual Ast* visitAnd(And* andNode) = 0;
 
-    virtual AstNode visitNot(NotNode notNode) = 0;
+    virtual Ast* visitNot(Not* notNode) = 0;
 
-    virtual AstNode visitOdd(OddNode oddNode) = 0;
+    virtual Ast* visitOdd(Odd* oddNode) = 0;
 
-    virtual AstNode visitArith(ArithNode arith) = 0;
+    virtual Ast* visitArith(Arith* arith) = 0;
 
-    virtual AstNode visitOp(OpNode op) = 0;
+    virtual Ast* visitOp(Op* op) = 0;
 
-    virtual AstNode visitUnary(UnaryNode unary) = 0;
+    virtual Ast* visitUnary(Unary* unary) = 0;
 
-    virtual AstNode visitConstant(ConstantNode constant) = 0;
+    virtual Ast* visitConstant(Constant* constant) = 0;
 
-    virtual AstNode visitId(IdNode id) = 0;
+    virtual Ast* visitId(Id* id) = 0;
 };

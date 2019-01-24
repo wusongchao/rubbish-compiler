@@ -1,9 +1,9 @@
 #include "AstVisitor.h"
 
-AstNode AstVisitor::visit(AstNode astNode)
+Ast* AstVisitor::visit(Ast* ast)
 {
-    if (astNode == nullptr) {
-        return astNode;
+    if (ast == nullptr) {
+        return ast;
     }
-    return astNode->accept(*this);
+    return ast->accept(*this);
 }

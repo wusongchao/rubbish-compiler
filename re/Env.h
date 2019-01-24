@@ -9,6 +9,7 @@ using std::unique_ptr;
 using std::shared_ptr;
 using std::string;
 using std::pair;
+using namespace AST;
 
 //template
 //<typename V>

@@ -18,8 +18,13 @@ string Var::toString()
     return string();
 }
 
-Id::Id(IdNode node)
+Id::Id(AST::IdNode node)
     :Var(VarTag::Id, node->type.width, node->offset), name(node->token.value)
+{
+}
+
+Id::Id(AST::Id* node)
+    : Var(VarTag::Id, node->type.width, node->offset), name(node->token.value)
 {
 }
 

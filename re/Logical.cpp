@@ -1,6 +1,8 @@
 #include "Logical.h"
 #include "AstVisitor.h"
 
+namespace AST{
+
 Logical::Logical(const CodeToken & token, ExprNode p1, ExprNode p2, bool constant)
     :Expr(token, Type::Bool, constant), expr1(std::move(p1)), expr2(std::move(p2))
 {
@@ -11,9 +13,9 @@ Logical::Logical(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
 {
 }
 
-AstNode Logical::accept(AstVisitor & visitor)
+Ast* Logical::accept(AstVisitor & visitor)
 {
-    return visitor.visitLogical(static_pointer_cast<Logical>(shared_from_this()));
+    return visitor.visitLogical(this);
 }
 
 Or::Or(const CodeToken & token, ExprNode p1, ExprNode p2, bool constant)
@@ -26,9 +28,9 @@ Or::Or(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
 {
 }
 
-AstNode Or::accept(AstVisitor & visitor)
+Ast* Or::accept(AstVisitor & visitor)
 {
-    return visitor.visitOr(static_pointer_cast<Or>(shared_from_this()));
+    return visitor.visitOr(this);
 }
 
 And::And(const CodeToken & token, ExprNode p1, ExprNode p2, bool constant)
@@ -41,9 +43,9 @@ And::And(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
 {
 }
 
-AstNode And::accept(AstVisitor & visitor)
+Ast* And::accept(AstVisitor & visitor)
 {
-    return visitor.visitAnd(static_pointer_cast<And>(shared_from_this()));
+    return visitor.visitAnd(this);
 }
 
 Not::Not(const CodeToken & token, ExprNode expr, bool constant)
@@ -56,9 +58,9 @@ Not::Not(CodeToken && token, ExprNode expr, bool constant)
 {
 }
 
-AstNode Not::accept(AstVisitor & visitor)
+Ast* Not::accept(AstVisitor & visitor)
 {
-    return visitor.visitNot(static_pointer_cast<Not>(shared_from_this()));
+    return visitor.visitNot(this);
 }
 
 Rel::Rel(const CodeToken & token, ExprNode p1, ExprNode p2, bool constant)
@@ -71,9 +73,9 @@ Rel::Rel(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
 {
 }
 
-AstNode Rel::accept(AstVisitor & visitor)
+Ast* Rel::accept(AstVisitor & visitor)
 {
-    return visitor.visitRel(static_pointer_cast<Rel>(shared_from_this()));
+    return visitor.visitRel(this);
 }
 
 // a special case
@@ -89,7 +91,9 @@ Odd::Odd(CodeToken && token, ExprNode expr, bool constant)
 {
 }
 
-AstNode Odd::accept(AstVisitor & visitor)
+Ast* Odd::accept(AstVisitor & visitor)
 {
-    return visitor.visitOdd(static_pointer_cast<Odd>(shared_from_this()));
+    return visitor.visitOdd(this);
+}
+
 }

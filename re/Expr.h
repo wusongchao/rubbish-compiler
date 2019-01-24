@@ -3,13 +3,15 @@
 #include "Type.h"
 #include "CodeToken.h"
 
+namespace AST {
+
 class Expr : public Ast {
 public:
     Expr(const CodeToken& token, const Type& type, bool constant = false);
 
     Expr(CodeToken&& token, const Type& type, bool constant = false);
 
-    AstNode accept(AstVisitor& visitor) override;
+    Ast* accept(AstVisitor& visitor) override;
 
     bool isConstant()
     {
@@ -37,7 +39,7 @@ public:
 
     Id(CodeToken&& token, const Type& type, int offset, bool constant = false);
 
-    AstNode accept(AstVisitor& visitor) override;
+    Ast* accept(AstVisitor& visitor) override;
 
     int offset;
 };
@@ -52,7 +54,7 @@ public:
 
     shared_ptr<Constant> static createBool(bool b);
 
-    AstNode accept(AstVisitor& visitor) override;
+    Ast* accept(AstVisitor& visitor) override;
 };
 
 class Temp : public Expr {
@@ -63,3 +65,5 @@ public:
 using IdNode = shared_ptr<Id>;
 using ConstantNode = shared_ptr<Constant>;
 using TempNode = shared_ptr<Temp>;
+
+}

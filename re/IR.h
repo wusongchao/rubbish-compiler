@@ -69,7 +69,8 @@ class Id : public Var {
 public:
     string name;
 
-    Id(IdNode node);
+    Id(AST::IdNode node);
+    Id(AST::Id* id);
 
     string toString() override;
 };

@@ -16,11 +16,18 @@ class AstVisitor;
 
 // an essential best practice for any reference-counted smart pointer type is to avoid copying it 
 // unless you really mean to add a new reference
-class Ast : public enable_shared_from_this<Ast> {
+
+namespace AST {
+
+class Ast {
 public:
-    virtual shared_ptr<Ast> accept(AstVisitor& visitor) = 0;
+    virtual Ast* accept(AstVisitor& visitor) = 0;
 
     virtual string toString();
 };
 
 using AstNode = shared_ptr<Ast>;
+
+}
+
+

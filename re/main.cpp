@@ -105,7 +105,7 @@ void test1() {
 	try {
 		auto p = parser.program();
 		IRGenerator generator;
-		generator.visit(p);
+		generator.visit(p.get());
 
         generator.output(outfile);
         ObjectCodeGenerator objectCodeGenerator(generator.getQuads(), p->block);
@@ -160,7 +160,7 @@ void test2() {
 	try {
 		auto p = parser.program();
 		IRGenerator generator;
-		generator.visit(p);
+		generator.visit(p.get());
 
         //generator.output(std::cout);
 
@@ -200,7 +200,7 @@ int main()
 	try {
 		auto p = parser.program();
 		IRGenerator generator;
-		generator.visit(p);
+		generator.visit(p.get());
 
         generator.output(std::cout);
 

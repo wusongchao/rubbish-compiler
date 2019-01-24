@@ -4,19 +4,21 @@
 using std::make_shared;
 using std::to_string;
 
+namespace AST {
+
 Expr::Expr(const CodeToken & token, const Type& type, bool constant)
     :token(token), type(type), constant(constant)
 {
 }
 
 Expr::Expr(CodeToken && token, const Type& type, bool constant)
-    :token(std::move(token)), type(type), constant(constant)
+    : token(std::move(token)), type(type), constant(constant)
 {
 }
 
-AstNode Expr::accept(AstVisitor & visitor)
+Ast* Expr::accept(AstVisitor & visitor)
 {
-    return visitor.visitExpr(static_pointer_cast<Expr>(shared_from_this()));
+    return visitor.visitExpr(this);
 }
 
 string Expr::toString()
@@ -30,13 +32,13 @@ Id::Id(const CodeToken & token, const Type& type, int offset, bool constant)
 }
 
 Id::Id(CodeToken && token, const Type& type, int offset, bool constant)
-    :Expr(std::move(token), type, constant), offset(offset)
+    : Expr(std::move(token), type, constant), offset(offset)
 {
 }
 
-AstNode Id::accept(AstVisitor & visitor)
+Ast* Id::accept(AstVisitor & visitor)
 {
-    return visitor.visitId(static_pointer_cast<Id>(shared_from_this()));
+    return visitor.visitId(this);
 }
 
 Constant::Constant(const CodeToken & token, const Type& type)
@@ -45,7 +47,7 @@ Constant::Constant(const CodeToken & token, const Type& type)
 }
 
 Constant::Constant(CodeToken && token, const Type& type)
-    :Expr(std::move(token), type, true)
+    : Expr(std::move(token), type, true)
 {
 }
 
@@ -70,12 +72,14 @@ shared_ptr<Constant> Constant::createBool(bool b)
 
 }
 
-AstNode Constant::accept(AstVisitor & visitor)
+Ast* Constant::accept(AstVisitor & visitor)
 {
-    return visitor.visitConstant(static_pointer_cast<Constant>(shared_from_this()));
+    return visitor.visitConstant(this);
 }
 
 Temp::Temp(int number, const Type & type, bool constant)
-    :Expr({CodeTokenType::Id, "t" + to_string(number)}, type, constant)
+    :Expr({ CodeTokenType::Id, "t" + to_string(number) }, type, constant)
 {
+}
+
 }
