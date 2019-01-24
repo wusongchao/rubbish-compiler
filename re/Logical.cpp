@@ -2,12 +2,12 @@
 #include "AstVisitor.h"
 
 Logical::Logical(const CodeToken & token, ExprNode p1, ExprNode p2, bool constant)
-    :Expr(token, Type::Bool, constant), expr1(p1), expr2(p2)
+    :Expr(token, Type::Bool, constant), expr1(std::move(p1)), expr2(std::move(p2))
 {
 }
 
 Logical::Logical(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
-    : Expr(std::move(token), Type::Bool, constant), expr1(p1), expr2(p2)
+    : Expr(std::move(token), Type::Bool, constant), expr1(std::move(p1)), expr2(std::move(p2))
 {
 }
 
@@ -17,12 +17,12 @@ AstNode Logical::accept(AstVisitor & visitor)
 }
 
 Or::Or(const CodeToken & token, ExprNode p1, ExprNode p2, bool constant)
-    : Logical(token, p1, p2, constant)
+    : Logical(token, std::move(p1), std::move(p2), constant)
 {
 }
 
 Or::Or(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
-    : Logical(std::move(token), p1, p2, constant)
+    : Logical(std::move(token), std::move(p1), std::move(p2), constant)
 {
 }
 
@@ -32,12 +32,12 @@ AstNode Or::accept(AstVisitor & visitor)
 }
 
 And::And(const CodeToken & token, ExprNode p1, ExprNode p2, bool constant)
-    : Logical(token, p1, p2, constant)
+    : Logical(token, std::move(p1), std::move(p2), constant)
 {
 }
 
 And::And(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
-    : Logical(std::move(token), p1, p2, constant)
+    : Logical(std::move(token), std::move(p1), std::move(p2), constant)
 {
 }
 
@@ -47,12 +47,12 @@ AstNode And::accept(AstVisitor & visitor)
 }
 
 Not::Not(const CodeToken & token, ExprNode expr, bool constant)
-    : Logical(token, expr, expr, constant)
+    : Logical(token, std::move(expr), std::move(expr), constant)
 {
 }
 
 Not::Not(CodeToken && token, ExprNode expr, bool constant)
-    : Logical(std::move(token), expr, expr, constant)
+    : Logical(std::move(token), std::move(expr), std::move(expr), constant)
 {
 }
 
@@ -62,12 +62,12 @@ AstNode Not::accept(AstVisitor & visitor)
 }
 
 Rel::Rel(const CodeToken & token, ExprNode p1, ExprNode p2, bool constant)
-    : Logical(token, p1, p2, constant)
+    : Logical(token, std::move(p1), std::move(p2), constant)
 {
 }
 
 Rel::Rel(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
-    : Logical(std::move(token), p1, p2, constant)
+    : Logical(std::move(token), std::move(p1), std::move(p2), constant)
 {
 }
 
@@ -76,6 +76,9 @@ AstNode Rel::accept(AstVisitor & visitor)
     return visitor.visitRel(static_pointer_cast<Rel>(shared_from_this()));
 }
 
+// a special case
+// In sematics, Odd belongs to Logical and Unary
+// maybe we will remove it the next version
 Odd::Odd(const CodeToken & token, ExprNode expr, bool constant)
     : Logical(token, expr, expr, constant)
 {

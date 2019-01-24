@@ -25,7 +25,7 @@ using StmtNode = shared_ptr<Stmt>;
 // the class ctor will copy it anyway
 class Assign : public Stmt {
 public:
-	Assign(shared_ptr<Id> id_, ExprNode expr_);
+	Assign(IdNode id_, ExprNode expr_);
 
 	shared_ptr<Ast> accept(AstVisitor& visitor) override;
 
@@ -57,6 +57,7 @@ public:
 class Call : public Stmt {
 public:
 	Call(IdNode id_, const vector<ExprNode>& param_);
+    Call(IdNode id_, vector<ExprNode>&& params_);
     
     AstNode accept(AstVisitor& visitor) override;
 

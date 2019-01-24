@@ -10,9 +10,12 @@ using std::string;
 class AstVisitor;
 
 // abstract syntax tree
-// enable_shared_from_this is needed
+// @Deprecated
+// enable_shared_from_this is (not) needed
 // since sometimes the class have to return a shared_ptr(this)
 
+// an essential best practice for any reference-counted smart pointer type is to avoid copying it 
+// unless you really mean to add a new reference
 class Ast : public enable_shared_from_this<Ast> {
 public:
     virtual shared_ptr<Ast> accept(AstVisitor& visitor) = 0;
@@ -21,5 +24,3 @@ public:
 };
 
 using AstNode = shared_ptr<Ast>;
-
-using AstPtr = Ast*;

@@ -9,7 +9,7 @@ AstNode Program::accept(AstVisitor & visitor)
 }
 
 Program::Program(CodeToken id, BlockNode block)
-	:id(id),block(block)
+	:id(id),block(std::move(block))
 {
 }
 

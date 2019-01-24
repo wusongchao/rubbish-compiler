@@ -22,7 +22,7 @@ Stmt::~Stmt()
 }
 
 While::While(ExprNode l_, StmtNode s_)
-	:cond(l_), stmt(s_)
+	:cond(std::move(l_)), stmt(std::move(s_))
 {
 }
 
@@ -32,12 +32,12 @@ AstNode While::accept(AstVisitor & visitor)
 }
 
 If::If(ExprNode l, StmtNode s1_, StmtNode s2_)
-	: cond(l), trueStmt(s1_), falseStmt(s2_)
+	: cond(std::move(l)), trueStmt(std::move(s1_)), falseStmt(std::move(s2_))
 {
 }
 
 If::If(ExprNode l, StmtNode s1_)
-	: cond(l), trueStmt(s1_), falseStmt(nullptr)
+	: cond(std::move(l)), trueStmt(std::move(s1_)), falseStmt(nullptr)
 {
 }
 
@@ -46,13 +46,18 @@ AstNode If::accept(AstVisitor & visitor)
     return visitor.visitIf(static_pointer_cast<If>(shared_from_this()));
 }
 
-Assign::Assign(shared_ptr<Id> id_, ExprNode expr_)
-	: id(id_), expr(expr_)
+Assign::Assign(IdNode id_, ExprNode expr_)
+	: id(std::move(id_)), expr(std::move(expr_))
 {
 }
 
 Call::Call(IdNode id_, const vector<ExprNode>& param_)
-	: id(id_), param(param_)
+	: id(std::move(id_)), param(std::move(param_))
+{
+}
+
+Call::Call(IdNode id_, vector<ExprNode>&& params_)
+    :id(std::move(id_)), param(std::move(params_))
 {
 }
 
@@ -112,12 +117,12 @@ AstNode Block::accept(AstVisitor & visitor)
 }
 
 Block::Block(vector<ProcNode> p, BodyNode b, shared_ptr<Env> t, shared_ptr<ConstEnv> cT)
-	:procs(p), body(b),top(t),constTop(cT)
+	:procs(std::move(p)), body(std::move(b)),top(std::move(t)),constTop(std::move(cT))
 {
 }
 
 Block::Block(vector<ProcNode> procs, BodyNode body)
-	:procs(procs), body(body)
+	:procs(std::move(procs)), body(std::move(body))
 {
 }
 
@@ -127,16 +132,16 @@ AstNode Proc::accept(AstVisitor & visitor)
 }
 
 Proc::Proc(IdNode id_, BlockNode block_, shared_ptr<FuncEnv> preFunc)
-	:id(id_), block(block_),preFunc(preFunc)
+	:id(std::move(id_)), block(std::move(block_)),preFunc(std::move(preFunc))
 {
 }
 
 Proc::Proc(IdNode id_, BlockNode block_)
-	:id(id_), block(block_)
+	:id(std::move(id_)), block(std::move(block_))
 {
 }
 
 void Proc::setPreFunc(shared_ptr<FuncEnv> preFunc)
 {
-	this->preFunc = preFunc;
+	this->preFunc = std::move(preFunc);
 }

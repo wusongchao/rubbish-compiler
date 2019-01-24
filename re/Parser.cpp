@@ -176,30 +176,30 @@ shared_ptr<Stmt> Parser::stmt()
                 semanticError("attempt to re-assign identifier " + token.value + " qualified by const in line: " + to_string(token.rowIndex));
             }
             match(CodeTokenType::Assign);
-			ExprNode exp = expr();
-			return make_shared<Assign>(id, exp);
+            //ExprNode exp{ expr() };
+			return make_shared<Assign>(id, expr());
 		}
         case CodeTokenType::If:
 		{
 			match(CodeTokenType::If);
 			ExprNode lexp = boolExpr();
 			match(CodeTokenType::Then);
-			StmtNode s1 = stmt();
+            StmtNode s1{ stmt() };
 			CodeToken token = lookahead;
 			if (lookahead.tokenType == CodeTokenType::Else) {
                 move();
-				StmtNode s2 = stmt();
-				return make_shared<If>(lexp, s1, s2);
+                StmtNode s2{ stmt() };
+				return make_shared<If>(std::move(lexp), std::move(s1), std::move(s2));
 			}
-			return make_shared<If>(lexp, s1);
+			return make_shared<If>(std::move(lexp), std::move(s1));
 		}
         case CodeTokenType::While:
 		{
 			match(CodeTokenType::While);
-			ExprNode lexp = boolExpr();
+            ExprNode lexp{ boolExpr() };
 			match(CodeTokenType::Do);
-			StmtNode s = stmt();
-			return make_shared<While>(lexp, s);
+            StmtNode s{ stmt() };
+			return make_shared<While>(std::move(lexp), std::move(s));
 		}
         case CodeTokenType::Call:
 		{

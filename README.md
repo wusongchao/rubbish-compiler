@@ -50,6 +50,7 @@ The program can accept input from any ```istream(cin, ifstream, istringstream, .
 7. fix the bug in the ir generataion phase, like the ```jmp``` in procedure visit phase, the ```if <bool>``` when ```<bool>``` is not a bool expression
 8. type check (and implicit conversion)
 9. function overload
+10. dfa charset compress
 
 ## NOTE
 

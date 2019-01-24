@@ -17,13 +17,13 @@ AstNode Op::accept(AstVisitor & visitor)
 }
 
 Arith::Arith(const CodeToken & token, ExprNode p1, ExprNode p2, bool constant)
-    :Op(token, Type::Null, constant), expr1(p1), expr2(p2)
+    :Op(token, Type::Null, constant), expr1(std::move(p1)), expr2(std::move(p2))
 {
     type = expr1->type;
 }
 
 Arith::Arith(CodeToken && token, ExprNode p1, ExprNode p2, bool constant)
-    : Op(std::move(token), Type::Null, constant), expr1(p1), expr2(p2)
+    : Op(std::move(token), Type::Null, constant), expr1(std::move(p1)), expr2(std::move(p2))
 {
     type = expr1->type;
 }
@@ -34,12 +34,12 @@ AstNode Arith::accept(AstVisitor & visitor)
 }
 
 Unary::Unary(const CodeToken & token, ExprNode expr, bool constant)
-    :Op(token, expr->type, constant), expr(expr)
+    :Op(token, expr->type, constant), expr(std::move(expr))
 {
 }
 
 Unary::Unary(CodeToken && token, ExprNode expr, bool constant)
-    : Op(std::move(token), expr->type, constant), expr(expr)
+    : Op(std::move(token), expr->type, constant), expr(std::move(expr))
 {
 }
 

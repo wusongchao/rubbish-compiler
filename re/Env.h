@@ -10,6 +10,57 @@ using std::shared_ptr;
 using std::string;
 using std::pair;
 
+//template
+//<typename V>
+//class _Env {
+//public:
+//    _Env(shared_ptr<_Env> prev)
+//        :prev(std::move(prev))
+//    {}
+//
+//    void putSymbol(const CodeToken& token, shared_ptr<V> symbol) {
+//        table.insert({ token.value, std::move(symbol) });
+//    }
+//
+//    void putSymbol(const string& name, shared_ptr<V> symbol) {
+//        table.insert({ name, std::move(symbol) });
+//    }
+//
+//    shared_ptr<V> getSymbol(const CodeToken& token) {
+//        _Env* cur = this;
+//        while (cur != nullptr) {
+//            auto endIter = cur->table.end();
+//            auto it = cur->table.find(token.value);
+//            if (it != endIter) {
+//                return it->second;
+//            }
+//            cur = cur->prev.get();
+//        }
+//
+//        return nullptr;
+//    }
+//
+//    int getSymbolDepth(const string& str) {
+//        int depth = 0;
+//        _Env* cur = this;
+//        while (cur != nullptr) {
+//            auto endIter = cur->table.end();
+//            auto it = cur->table.find(str);
+//            if (it != endIter) {
+//                return depth;
+//            }
+//            cur = cur->prev.get();
+//            ++depth;
+//        }
+//
+//        return -1;
+//    }
+//private:
+//    shared_ptr<_Env> prev{ nullptr };
+//
+//    unordered_map<string, shared_ptr<V>> table;
+//};
+
 class Env {
 public:
     Env(shared_ptr<Env> prev);
