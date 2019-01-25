@@ -71,3 +71,49 @@ nullptr
 ```
 
 a can call b(declaration in func a's field), a cannot call c, but c can call a
+
+## example
+
+for code
+```
+program control;
+const 
+  i := 2,
+  i2 := 3
+var a, b, c
+// this is comment
+begin
+  while (odd a && b <> 2) do
+    a := 1 + 2 + b;
+
+if (!(odd i2) || false) then
+  c := -7
+else if c > 3 then
+  c := c + 1
+else
+  b := i2 + 3 - (5 * i) * 5
+end
+```
+
+it produce quad IR like
+```
+label0:
+(Jnodd, a, -, 1)
+(j==, b, 2, 1)
+(+, 3, b, t1)
+(=, t1, -, a)
+(jmp, -, -, 0)
+label1:
+(jmp, -, -, 2)
+(=, -7, -, c)
+(jmp, -, -, 3)
+label2:
+(j<=, c, 3, 4)
+(+, c, 1, t2)
+(=, t2, -, c)
+(jmp, -, -, 5)
+label4:
+(=, -44, -, b)
+label5:
+label3:
+```

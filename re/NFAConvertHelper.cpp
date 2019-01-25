@@ -7,6 +7,26 @@
 using std::stack;
 using std::unordered_set;
 
+//DFAState getClosure_(const NFAStatesSet& statesSet)
+//{
+//    NFAStatesSet t = statesSet;
+//    NFAStatesSet t_;
+//    do {
+//        t_ = t;
+//        for (const NFAState* state : t) {
+//            const auto& outEdges = state->getOutEdges();
+//            for (NFAEdge* edge : outEdges) {
+//                if (edge->isEmpty()) {
+//                    t.insert(edge->getTargetState());
+//                }
+//            }
+//        }
+//        t = t_;
+//    } while (t == t_);
+//
+//    return DFAState(std::move(t), accept);
+//}
+
 DFAState getClosure(const NFAState* nfaState)
 {
     stack<const NFAState*> stateStack;
@@ -74,15 +94,3 @@ NFAStatesSet move(const DFAState & dfaState, char ch)
 
     return res;
 }
-//
-//DFAModel NFAToDFAConverter::convert(const NFAModel & nfaModel)
-//{
-//    // for one character, two state
-//
-//    //state 0 is an empty state. All invalid inputs go to state 0
-//    DFAState state0;
-//
-//    //state 1 is closure(nfaState[0])
-//    DFAState state1(getClosure(nfaModel.getEntryEdge()->getTargetState()));
-//    state1.setIndex(1);
-//}
