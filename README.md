@@ -42,17 +42,16 @@ The program can accept input from any ```istream(cin, ifstream, istringstream, .
 
 ## TODO
 
-1. [] change some grammar, for example: replace ```begin end``` with ```{}```
-
-2. [] more clearly nested block rule(nested function declaration is allowed, the enclosure reference behaviour is similar to value capturing)
-3. [] construct type, ```T[]``` or ```struct```
-4. [] allow initialzation in variable declaration
-5. [] change the IR format
-6. [] add keyword ```break```, ```continue```, ```return```
-7. [] fix the bug in the ir generataion phase, like the ```jmp``` in procedure visit phase, the ```if <bool>``` when ```<bool>``` is not a bool expression
-8. [] type check (and implicit conversion)
-9. [] function overload
-10. [] dfa charset compress
+1. change some grammar, for example: replace ```begin end``` with ```{}```
+2. more clearly nested block rule(nested function declaration is allowed, the enclosure reference behaviour is similar to value capturing)
+3. construct type, ```T[]``` or ```struct```
+4. allow initialzation in variable declaration
+5. change the IR format
+6. add keyword ```break```, ```continue```, ```return```
+7. fix the bug in the ir generataion phase, like the ```jmp``` in procedure visit phase, the ```if <bool>``` when ```<bool>``` is not a bool expression
+8. type check (and implicit conversion)
+9. function overload
+10. dfa charset compress
 
 ## NOTE
 
